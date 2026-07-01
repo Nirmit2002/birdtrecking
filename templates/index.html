@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map — White Stork Migration Visualiser</title>
+
+  <!-- MapLibre GL JS (open-source, no API key required) -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css">
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Font Awesome & project CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    /* Map-page layout overrides */
+    body { margin: 0; overflow: hidden; }
+    #app-wrapper { display: flex; height: 100vh; width: 100vw; background: #0d1117; }
+
+    /* MAP PANEL — left 70% */
+    #map-panel { position: relative; flex: 0 0 70%; height: 100%; }
+    #map { position: absolute; inset: 0; }
+
+    /* RIGHT PANEL — 30% */
+    #right-panel {
+      flex: 0 0 30%;
+      height: 100%;
+      background: #ffffff;
+      border-left: 1px solid #dddddd;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* BOTTOM BAR — inside map panel */
+    #bottom-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid #dddddd;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-wrapper">
+
+  <!-- ── LEFT: Map panel ──────────────────────────────────────────── -->
+  <div id="map-panel">
+    <div id="map"></div>
+
+    <!-- Map attribution overlay -->
+    <div style="position:absolute;top:10px;left:10px;z-index:50;">
+      <div style="background:rgba(255,255,255,0.92);border:1px solid #dddddd;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <i class="fa-solid fa-dove" style="color:#333333;font-size:18px;"></i>
+        <span style="color:#111111;font-size:13px;font-weight:600;">White Stork GPS · Portugal 2022</span>
+      </div>
+    </div>
+
+    <!-- Bottom timeline bar -->
+    <div id="bottom-bar">
+      <button id="btn-play" class="map-btn" onclick="togglePlay()">
+        <i class="fa-solid fa-play" id="play-icon"></i>
+      </button>
+      <button class="map-btn" onclick="resetTimeline()">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <input type="range" id="timeline-slider" min="0" max="100" value="100"
+             style="flex:1;" oninput="onSliderChange(this.value)">
+      <span id="time-label" style="color:#8b949e;font-size:12px;min-width:140px;text-align:center;">—</span>
+      <select id="speed-select" class="map-btn" onchange="setSpeed(this.value)"
+              style="padding:4px 8px;cursor:pointer;">
+        <option value="1">1×</option>
+        <option value="2">2×</option>
+        <option value="5">5×</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Control panel ──────────────────────────────────────── -->
+  <div id="right-panel">
+
+    <!-- User header -->
+    <div class="rp-header">
+      <div class="rp-user">
+        <div class="rp-avatar">{{ (current_user.full_name or current_user.username)[0].upper() }}</div>
+        <div>
+          <div class="rp-username">{{ current_user.full_name or current_user.username }}</div>
+          <div class="rp-role">{{ current_user.role }}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <a href="{{ url_for('dashboard') }}" class="rp-link" title="Dashboard">
+          <i class="fa-solid fa-gauge-high"></i>
+        </a>
+        <a href="{{ url_for('logout') }}" class="rp-link" title="Logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="rp-body">
+
+      <!-- Bird toggle switches -->
+      <div class="rp-section">
+        <h4 class="rp-section-title"><i class="fa-solid fa-dove"></i> Bird Layers</h4>
+        <div class="bird-toggles">
+          <div class="bird-toggle" onclick="toggleBird('Perneta_O285')">
+            <span class="dot dot-cyan"></span>
+            <span class="toggle-label">Perneta O285</span>
+            <div class="toggle-switch active" id="toggle-Perneta_O285"></div>
+          </div>
+          <div class="bird-toggle" onclick="toggleBird('Castro_O284')">
+            <span class="dot dot-green"></span>
+            <span class="toggle-label">Castro O284</span>
+            <div class="toggle-switch active" id="toggle-Castro_O284"></div>
+          </div>
+          <div class="bird-toggle" onclick="toggleBird('Mineiro_O283')">
+            <span class="dot dot-pink"></span>
+            <span class="toggle-label">Mineiro O283</span>
+            <div class="toggle-switch active" id="toggle-Mineiro_O283"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected point info card -->
+      <div class="rp-section" id="point-info-section">
+        <h4 class="rp-section-title"><i class="fa-solid fa-circle-info"></i> Selected Point</h4>
+        <div class="info-card" id="point-info">
+          <div class="info-placeholder">
+            <i class="fa-solid fa-location-dot"></i>
+            <p>Click a point on the map to see details</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-bird stats -->
+      <div class="rp-section">
+        <h4 class="rp-section-title"><i class="fa-solid fa-chart-bar"></i> Bird Statistics</h4>
+        <div id="bird-stats-panel">
+          <div class="info-placeholder"><i class="fa-solid fa-spinner fa-spin"></i> Loading…</div>
+        </div>
+      </div>
+
+      <!-- Speed chart -->
+      <div class="rp-section">
+        <h4 class="rp-section-title"><i class="fa-solid fa-gauge"></i> Speed Over Time (km/h)</h4>
+        <div class="chart-container">
+          <canvas id="speed-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Altitude chart -->
+      <div class="rp-section">
+        <h4 class="rp-section-title"><i class="fa-solid fa-mountain"></i> Altitude Over Time (m)</h4>
+        <div class="chart-container">
+          <canvas id="altitude-chart"></canvas>
+        </div>
+      </div>
+
+    </div><!-- end rp-body -->
+  </div><!-- end right-panel -->
+
+</div><!-- end app-wrapper -->
+
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

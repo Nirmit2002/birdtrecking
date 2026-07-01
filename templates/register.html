@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — White Stork Migration Visualiser</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="auth-body">
+
+  <div class="bg-particles">
+    <div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <div class="auth-container auth-container--center">
+    <div class="auth-card auth-card--wide">
+
+      <div class="auth-logo">
+        <div class="stork-icon">
+          <i class="fa-solid fa-dove"></i>
+        </div>
+        <h1>Create Account</h1>
+        <p class="auth-subtitle">White Stork Migration Visualiser</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <i class="fa-solid fa-{{ 'check-circle' if category == 'success' else 'triangle-exclamation' }}"></i>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fa-solid fa-id-card"></i> Full Name</label>
+            <input type="text" name="full_name" class="form-control"
+                   placeholder="e.g. Fenil Kachhadiya" required>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> Username</label>
+            <input type="text" name="username" class="form-control"
+                   placeholder="Choose a username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" name="email" class="form-control"
+                 placeholder="your@email.ac.uk" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password</label>
+            <input type="password" name="password" class="form-control"
+                   placeholder="Min. 6 characters" required>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-user-tag"></i> Role</label>
+            <select name="role" class="form-control">
+              <option value="researcher">Researcher</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          <i class="fa-solid fa-user-plus"></i> Create Account
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

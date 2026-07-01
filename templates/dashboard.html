@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — White Stork Migration Visualiser</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="app-body">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────────── -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <i class="fa-solid fa-dove"></i>
+      <div>
+        <span class="brand-name">StorkViz</span>
+        <span class="brand-sub">Migration Tracker</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="active">
+        <a href="{{ url_for('dashboard') }}">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('map_view') }}">
+          <i class="fa-solid fa-map"></i> Map Visualisation
+        </a>
+      </li>
+      {% if current_user.is_admin %}
+      <li>
+        <a href="{{ url_for('admin') }}">
+          <i class="fa-solid fa-sliders"></i> Admin Panel
+        </a>
+      </li>
+      {% endif %}
+      <li class="nav-bottom">
+        <a href="{{ url_for('logout') }}" class="logout-link">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ (current_user.full_name or current_user.username)[0].upper() }}</div>
+      <div>
+        <div class="user-name">{{ current_user.full_name or current_user.username }}</div>
+        <div class="user-role role-{{ current_user.role }}">{{ current_user.role }}</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main content ─────────────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </h2>
+        <p class="page-subtitle">
+          Welcome back, <strong>{{ current_user.full_name or current_user.username }}</strong>!
+          Here's an overview of the White Stork Migration study.
+        </p>
+      </div>
+      <a href="{{ url_for('map_view') }}" class="btn btn-primary">
+        <i class="fa-solid fa-map"></i> Open Map
+      </a>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="stats-grid">
+      <div class="stat-card cyan">
+        <div class="stat-icon"><i class="fa-solid fa-dove"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.overall.total_birds if stats.overall else 3 }}</div>
+          <div class="stat-label">Birds Tracked</div>
+        </div>
+      </div>
+
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fa-solid fa-satellite"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.overall.total_points if stats.overall else '98' }}</div>
+          <div class="stat-label">GPS Fix Points</div>
+        </div>
+      </div>
+
+      <div class="stat-card pink">
+        <div class="stat-icon"><i class="fa-solid fa-route"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">
+            {{ "%.0f"|format(stats.overall.total_distance_km) if stats.overall else '—' }} km
+          </div>
+          <div class="stat-label">Total Distance</div>
+        </div>
+      </div>
+
+      <div class="stat-card yellow">
+        <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">
+            {% if stats.overall %}
+              {{ stats.overall.date_range_start }} – {{ stats.overall.date_range_end }}
+            {% else %}
+              2022-05-07 – 2022-05-09
+            {% endif %}
+          </div>
+          <div class="stat-label">Data Range</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bird panels -->
+    <h3 class="section-title"><i class="fa-solid fa-dove"></i> Individual Bird Statistics</h3>
+    <div class="bird-grid">
+      {% set bird_colors = {'Perneta_O285': 'cyan', 'Castro_O284': 'green', 'Mineiro_O283': 'pink'} %}
+      {% set bird_icons  = {'Perneta_O285': '🦅', 'Castro_O284': '🦢', 'Mineiro_O283': '🐦'} %}
+
+      {% if stats.birds %}
+        {% for bird_id, bstats in stats.birds.items() %}
+        <div class="bird-card bird-card--{{ bird_colors.get(bird_id, 'cyan') }}">
+          <div class="bird-card-header">
+            <span class="bird-dot bird-dot--{{ bird_colors.get(bird_id, 'cyan') }}"></span>
+            <h4>{{ bird_id.replace('_', ' ') }}</h4>
+            <span class="bird-role-badge">GPS Tag</span>
+          </div>
+          <div class="bird-stats-grid">
+            <div class="bstat">
+              <div class="bstat-val">{{ "%.1f"|format(bstats.total_distance_km) }} km</div>
+              <div class="bstat-lbl">Distance</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">{{ "%.1f"|format(bstats.avg_speed_kmh) }} km/h</div>
+              <div class="bstat-lbl">Avg Speed</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">{{ bstats.max_altitude_m }} m</div>
+              <div class="bstat-lbl">Max Alt.</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">{{ bstats.stopovers_count }}</div>
+              <div class="bstat-lbl">Stop-overs</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">{{ bstats.migration_days }} d</div>
+              <div class="bstat-lbl">Duration</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">{{ bstats.dominant_heading }}</div>
+              <div class="bstat-lbl">Heading</div>
+            </div>
+          </div>
+          <div class="bird-card-footer">
+            <small><i class="fa-solid fa-clock"></i> {{ bstats.start_date }}</small>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-data-msg">
+          <i class="fa-solid fa-circle-info"></i>
+          Data not yet processed. Start the server to trigger preprocessing.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent uploads + activity -->
+    <div class="bottom-grid">
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Uploads</h3>
+        </div>
+        <div class="panel-body">
+          {% if recent_uploads %}
+            <table class="data-table">
+              <thead>
+                <tr><th>File</th><th>Date</th><th>Rows</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {% for up in recent_uploads %}
+                <tr>
+                  <td><i class="fa-solid fa-file-excel"></i> {{ up.filename }}</td>
+                  <td>{{ up.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>{{ up.rows_processed }}</td>
+                  <td><span class="badge badge-{{ 'success' if up.status == 'processed' else 'danger' }}">{{ up.status }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="empty-msg">No uploads yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
+        </div>
+        <div class="panel-body quick-actions">
+          <a href="{{ url_for('map_view') }}" class="action-btn">
+            <i class="fa-solid fa-map"></i>
+            <span>Open Map</span>
+          </a>
+          {% if current_user.is_admin %}
+          <a href="{{ url_for('admin') }}" class="action-btn">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Admin Panel</span>
+          </a>
+          {% endif %}
+          <div class="action-btn info-action">
+            <i class="fa-solid fa-users"></i>
+            <span>{{ all_users_count }} Users</span>
+          </div>
+          <div class="action-btn info-action">
+            <i class="fa-solid fa-database"></i>
+            <span>MySQL DB</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

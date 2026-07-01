@@ -1,0 +1,96 @@
+{
+  "birds": {
+    "Castro_O284": {
+      "bird_id": "Castro_O284",
+      "data_points": 30,
+      "total_distance_km": 0.09,
+      "avg_speed_kmh": 0.2,
+      "max_speed_kmh": 1.0,
+      "max_altitude_m": 173,
+      "min_altitude_m": 140,
+      "avg_altitude_m": 156.2,
+      "stopovers_count": 1,
+      "stopovers": [
+        {
+          "lat": 37.79345881144202,
+          "lon": -7.995460637410477,
+          "duration_h": 2.04,
+          "start_time": "2022-05-08T11:39:40",
+          "end_time": "2022-05-08T13:42:07",
+          "n_fixes": 30
+        }
+      ],
+      "migration_days": 1,
+      "migration_hours": 2.0,
+      "dominant_heading": "SE",
+      "start_date": "2022-05-08 11:39 UTC",
+      "end_date": "2022-05-08 13:42 UTC",
+      "avg_battery": 100.0,
+      "avg_satellites": 8.8
+    },
+    "Mineiro_O283": {
+      "bird_id": "Mineiro_O283",
+      "data_points": 30,
+      "total_distance_km": 2.72,
+      "avg_speed_kmh": 13.73,
+      "max_speed_kmh": 45.0,
+      "max_altitude_m": 605,
+      "min_altitude_m": 196,
+      "avg_altitude_m": 345.0,
+      "stopovers_count": 1,
+      "stopovers": [
+        {
+          "lat": 37.566370391845666,
+          "lon": -7.963221311569209,
+          "duration_h": 27.02,
+          "start_time": "2022-05-07T14:32:03",
+          "end_time": "2022-05-08T17:33:23",
+          "n_fixes": 20
+        }
+      ],
+      "migration_days": 1,
+      "migration_hours": 28.0,
+      "dominant_heading": "E",
+      "start_date": "2022-05-07 13:30 UTC",
+      "end_date": "2022-05-08 17:33 UTC",
+      "avg_battery": 100.0,
+      "avg_satellites": 9.0
+    },
+    "Perneta_O285": {
+      "bird_id": "Perneta_O285",
+      "data_points": 30,
+      "total_distance_km": 1.1,
+      "avg_speed_kmh": 0.6,
+      "max_speed_kmh": 18.0,
+      "max_altitude_m": 184,
+      "min_altitude_m": 153,
+      "avg_altitude_m": 170.6,
+      "stopovers_count": 1,
+      "stopovers": [
+        {
+          "lat": 37.827341540106374,
+          "lon": -8.048188998781399,
+          "duration_h": 2.04,
+          "start_time": "2022-05-09T09:43:44",
+          "end_time": "2022-05-09T11:46:02",
+          "n_fixes": 29
+        }
+      ],
+      "migration_days": 1,
+      "migration_hours": 2.0,
+      "dominant_heading": "N",
+      "start_date": "2022-05-09 09:43 UTC",
+      "end_date": "2022-05-09 11:46 UTC",
+      "avg_battery": 99.8,
+      "avg_satellites": 8.1
+    }
+  },
+  "overall": {
+    "total_points": 90,
+    "total_birds": 3,
+    "date_range_start": "2022-05-07",
+    "date_range_end": "2022-05-09",
+    "total_distance_km": 3.91,
+    "preprocessed_at": "2026-06-28 19:24 UTC"
+  }
+}

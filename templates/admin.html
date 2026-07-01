@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — White Stork Migration Visualiser</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="app-body">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <i class="fa-solid fa-dove"></i>
+      <div>
+        <span class="brand-name">StorkViz</span>
+        <span class="brand-sub">Migration Tracker</span>
+      </div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+      <li><a href="{{ url_for('map_view') }}"><i class="fa-solid fa-map"></i> Map Visualisation</a></li>
+      <li class="active"><a href="{{ url_for('admin') }}"><i class="fa-solid fa-sliders"></i> Admin Panel</a></li>
+      <li class="nav-bottom">
+        <a href="{{ url_for('logout') }}" class="logout-link">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+      </li>
+    </ul>
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ (current_user.full_name or current_user.username)[0].upper() }}</div>
+      <div>
+        <div class="user-name">{{ current_user.full_name or current_user.username }}</div>
+        <div class="user-role role-admin">admin</div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <div>
+        <h2 class="page-title"><i class="fa-solid fa-sliders"></i> Admin Panel</h2>
+        <p class="page-subtitle">Manage users, data files, and system operations.</p>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- System stats row -->
+    <div class="stats-grid">
+      <div class="stat-card cyan">
+        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ users|length }}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fa-solid fa-file-excel"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ uploads|length }}</div>
+          <div class="stat-label">Data Files</div>
+        </div>
+      </div>
+      <div class="stat-card pink">
+        <div class="stat-icon"><i class="fa-solid fa-satellite"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.overall.total_points if stats.overall else '—' }}</div>
+          <div class="stat-label">GPS Points</div>
+        </div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon"><i class="fa-solid fa-database"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">MySQL</div>
+          <div class="stat-label">Database</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+
+      <!-- User management -->
+      <div class="panel panel--full">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-users-gear"></i> User Management</h3>
+        </div>
+        <div class="panel-body">
+          <table class="data-table admin-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Name</th><th>Username</th><th>Email</th>
+                <th>Role</th><th>Last Login</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.full_name or '—' }}</td>
+                <td><code>{{ user.username }}</code></td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <span class="badge badge-{{ 'warning' if user.role == 'admin' else 'info' }}">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                <td class="action-col">
+                  <button class="btn btn-sm btn-outline"
+                          onclick="changeRole({{ user.id }}, '{{ user.role }}')">
+                    <i class="fa-solid fa-arrows-rotate"></i> Role
+                  </button>
+                  {% if user.username != 'admin' and user.id != current_user.id %}
+                  <button class="btn btn-sm btn-danger"
+                          onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Upload new data -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-upload"></i> Upload GPS Data</h3>
+        </div>
+        <div class="panel-body">
+          <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" class="upload-form">
+            <div class="form-group">
+              <label>Select Excel / CSV File</label>
+              <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-upload"></i> Upload &amp; Process
+            </button>
+          </form>
+
+          <div class="divider"></div>
+
+          <button class="btn btn-outline" onclick="reprocess()">
+            <i class="fa-solid fa-rotate"></i> Reprocess Current Data
+          </button>
+          <div id="reprocess-msg" class="reprocess-feedback"></div>
+        </div>
+      </div>
+
+      <!-- Upload history -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> Upload History</h3>
+        </div>
+        <div class="panel-body">
+          {% if uploads %}
+          <table class="data-table">
+            <thead>
+              <tr><th>Filename</th><th>Date</th><th>Rows</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {% for up in uploads %}
+              <tr>
+                <td><i class="fa-solid fa-file-excel"></i> {{ up.filename }}</td>
+                <td>{{ up.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ up.rows_processed }}</td>
+                <td>
+                  <span class="badge badge-{{ 'success' if up.status == 'processed' else 'danger' }}">
+                    {{ up.status }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+            <p class="empty-msg">No uploads yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    async function deleteUser(userId, username) {
+      if (!confirm('Delete user "' + username + '"? This cannot be undone.')) return;
+      const res = await fetch('/api/users/delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: userId})
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('User deleted.');
+        location.reload();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    }
+
+    async function changeRole(userId, currentRole) {
+      const newRole = currentRole === 'admin' ? 'researcher' : 'admin';
+      if (!confirm('Change role to "' + newRole + '"?')) return;
+      const res = await fetch('/api/users/role', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: userId, role: newRole})
+      });
+      const data = await res.json();
+      if (data.success) location.reload();
+      else alert('Error: ' + data.error);
+    }
+
+    async function reprocess() {
+      const btn = event.target;
+      const msg = document.getElementById('reprocess-msg');
+      btn.disabled = true;
+      msg.textContent = 'Processing…';
+      msg.className = 'reprocess-feedback info';
+      const res = await fetch('/api/reprocess', {method: 'POST'});
+      const data = await res.json();
+      msg.textContent = data.message;
+      msg.className = 'reprocess-feedback ' + (data.success ? 'success' : 'error');
+      btn.disabled = false;
+    }
+  </script>
+</body>
+</html>
