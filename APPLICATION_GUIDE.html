@@ -1,962 +1,652 @@
-<title>White Stork Migration Visualiser — Complete Guide</title>
+<title>White Stork Migration Visualiser — Full Guide</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:    #0D1B2A;
+  --teal:   #1B9E7C;
+  --teal2:  #147A5E;
+  --amber:  #D4892A;
+  --amber2: #EDD5A8;
+  --stone:  #F1EFE9;
+  --white:  #FFFFFF;
+  --slate:  #5F7080;
+  --border: #D8D4CC;
+  --card:   #FFFFFF;
+  --ff-head: Palatino Linotype, Palatino, Book Antiqua, Georgia, serif;
+  --ff-body: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  --ff-code: Courier New, Courier, monospace;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--ff-body);color:var(--ink);background:var(--stone);line-height:1.7;-webkit-font-smoothing:antialiased}
 
-  :root {
-    --night:     #0C1A2E;
-    --teal:      #2A8F74;
-    --teal-dark: #1E6B57;
-    --amber:     #C07830;
-    --amber-lt:  #F0E0C8;
-    --ground:    #F5F3EF;
-    --card:      #FFFFFF;
-    --slate:     #7B8D9E;
-    --border:    #DDD9D3;
-    --ink:       #1C2B3A;
+/* ── TOPBAR ── */
+.topbar{background:var(--ink);padding:0 2rem;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.07)}
+.topbar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none}
+.topbar-inner::-webkit-scrollbar{display:none}
+.topbar-inner a{color:#7A92A8;text-decoration:none;font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.7rem 1rem;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.topbar-inner a:hover{color:#fff;border-bottom-color:var(--teal)}
 
-    --ff-display: Georgia, 'Times New Roman', serif;
-    --ff-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --ff-code:    'Courier New', Courier, monospace;
+/* ── HERO ── */
+.hero{background:var(--ink);padding:4.5rem 2rem 3.5rem;color:#fff}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:3rem;align-items:center}
+.hero-eye{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem}
+.hero h1{font-family:var(--ff-head);font-size:clamp(2rem,4.5vw,3.4rem);font-weight:normal;line-height:1.15;text-wrap:balance;margin-bottom:1rem;color:#fff}
+.hero h1 em{font-style:italic;color:#8DD4C0}
+.hero-sub{font-size:1.05rem;color:#8FA8BC;max-width:52ch;line-height:1.65;margin-bottom:2rem}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem}
+.tag{border:1px solid rgba(27,158,124,.4);color:#8DD4C0;font-size:.72rem;font-weight:600;letter-spacing:.05em;padding:.25rem .7rem;background:rgba(27,158,124,.08)}
+.hero-birds{display:flex;flex-direction:column;gap:.75rem}
+.hbird{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:.75rem 1.1rem;min-width:190px}
+.hbird-name{font-family:var(--ff-head);font-style:italic;font-size:.95rem;color:#C8E0D8;margin-bottom:.15rem}
+.hbird-stat{font-size:.75rem;color:#5F7A8A;font-variant-numeric:tabular-nums}
 
-    --measure: 70ch;
-  }
+/* ── SECTION WRAPPER ── */
+.sec{padding:4.5rem 2rem}
+.sec.alt{background:var(--white)}
+.sec-inner{max-width:1100px;margin:0 auto}
+.sec-label{font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:.6rem}
+.sec h2{font-family:var(--ff-head);font-size:clamp(1.6rem,3vw,2.3rem);font-weight:normal;line-height:1.2;text-wrap:balance;color:var(--ink);margin-bottom:1.2rem;max-width:28ch}
+.lead{font-size:1.05rem;color:#2E4050;max-width:68ch;margin-bottom:1.5rem;line-height:1.7}
+.body-p{font-size:.95rem;color:#3A4E5C;max-width:70ch;margin-bottom:.9rem;line-height:1.7}
 
-  html { font-size: 16px; scroll-behavior: smooth; }
+/* ── TECH STACK GRID ── */
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2rem}
+@media(max-width:900px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.tech-grid{grid-template-columns:1fr}}
+.tcard{background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column}
+.tcard-head{padding:1.1rem 1.25rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:.85rem}
+.tcard-icon{width:38px;height:38px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tcard-icon svg{width:20px;height:20px;fill:var(--teal)}
+.tcard-title{font-family:var(--ff-head);font-size:1.05rem;color:var(--ink);margin-bottom:.2rem}
+.tcard-badge{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);background:var(--amber2);padding:.15rem .45rem}
+.tcard-body{padding:1rem 1.25rem;flex:1;display:flex;flex-direction:column;gap:.85rem}
+.tcard-what,.tcard-why{font-size:.875rem;line-height:1.6;color:#3A4E5C}
+.tcard-why-label,.tcard-what-label{font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal2);margin-bottom:.3rem}
+.tcard-why{background:rgba(27,158,124,.06);border-left:2px solid var(--teal);padding:.6rem .8rem}
 
-  body {
-    background: var(--ground);
-    color: var(--ink);
-    font-family: var(--ff-body);
-    font-size: 1rem;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-  }
+/* ── HOW IT WORKS — FLOW ── */
+.flow-diagram{margin:2.5rem 0;display:flex;flex-direction:column;gap:0}
+.flow-row{display:flex;align-items:stretch;gap:0}
+.flow-box{background:var(--card);border:1px solid var(--border);padding:1rem 1.25rem;flex:1}
+.flow-box.accent{background:var(--ink);border-color:var(--ink)}
+.flow-box.accent .fb-title{color:#8DD4C0}
+.flow-box.accent .fb-desc{color:#5F7A8A}
+.flow-box.teal{background:var(--teal);border-color:var(--teal)}
+.flow-box.teal .fb-title{color:#fff}
+.flow-box.teal .fb-desc{color:rgba(255,255,255,.7)}
+.fb-label{font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--slate);margin-bottom:.3rem}
+.flow-box.accent .fb-label{color:rgba(255,255,255,.3)}
+.flow-box.teal .fb-label{color:rgba(255,255,255,.6)}
+.fb-title{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:.2rem}
+.fb-desc{font-size:.78rem;color:var(--slate);line-height:1.5}
+.flow-arrow-v{display:flex;justify-content:flex-start;padding:0 0 0 1.5rem;align-items:center;height:32px}
+.flow-arrow-v::before{content:'↓';font-size:1.1rem;color:var(--teal);font-weight:700}
+.flow-arrow-h{width:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.flow-arrow-h::before{content:'→';font-size:1rem;color:var(--teal);font-weight:700}
+.flow-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin:2.5rem 0}
+.flow-col-box{background:var(--card);padding:1.25rem}
+.flow-col-num{width:28px;height:28px;background:var(--teal);color:#fff;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem}
+.flow-col-title{font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.4rem}
+.flow-col-body{font-size:.82rem;color:#3A4E5C;line-height:1.6}
 
-  /* ── HERO ─────────────────────────────────────────── */
-  .hero {
-    background: var(--night);
-    color: #fff;
-    padding: 5rem 2rem 4rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-  }
-  .hero-eyebrow {
-    font-family: var(--ff-body);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--teal);
-    margin-bottom: 1.4rem;
-  }
-  .hero h1 {
-    font-family: var(--ff-display);
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
-    font-weight: normal;
-    line-height: 1.15;
-    text-wrap: balance;
-    color: #fff;
-    margin-bottom: 1.5rem;
-    max-width: 20ch;
-  }
-  .hero h1 em {
-    font-style: italic;
-    color: #A8D4C8;
-  }
-  .hero-desc {
-    font-size: 1.1rem;
-    color: #B0BEC8;
-    max-width: 55ch;
-    line-height: 1.65;
-    margin-bottom: 2.5rem;
-  }
-  .hero-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-  .pill {
-    background: rgba(42,143,116,0.2);
-    border: 1px solid rgba(42,143,116,0.4);
-    color: #A8D4C8;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    padding: 0.3rem 0.85rem;
-    border-radius: 2px;
-  }
-  .hero-svg {
-    position: absolute;
-    right: -20px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.12;
-    pointer-events: none;
-  }
+/* ── CODE SECTIONS ── */
+.code-block{margin:2rem 0}
+.code-block-head{display:flex;align-items:center;justify-content:space-between;background:var(--ink);padding:.6rem 1rem .6rem 1.25rem}
+.code-block-title{font-size:.78rem;font-weight:700;color:#8DD4C0;letter-spacing:.05em}
+.code-block-file{font-size:.7rem;color:#4A6070;font-family:var(--ff-code)}
+.code-annotated{display:grid;grid-template-columns:1fr 300px;gap:0;border:1px solid var(--border)}
+@media(max-width:800px){.code-annotated{grid-template-columns:1fr}}
+.code-pane{overflow-x:auto;background:#0A1520}
+.code-pane pre{font-family:var(--ff-code);font-size:.8rem;line-height:1.7;color:#C8D8E8;padding:1.25rem 1.5rem;white-space:pre;tab-size:2;counter-reset:line}
+.ln{display:inline-block;width:2.2em;text-align:right;margin-right:1.2em;color:#2A4050;user-select:none;font-variant-numeric:tabular-nums}
+.kw{color:#7EC8E3}.str{color:#9DD49D}.cm{color:#3A5A68;font-style:italic}.fn{color:#E8C87A}.dec{color:#C8A0E0}.num{color:#F0C878}.op{color:#7A9AB0}
+.anno-pane{background:#F8F6F2;border-left:1px solid var(--border)}
+@media(max-width:800px){.anno-pane{border-left:none;border-top:1px solid var(--border)}}
+.anno{padding:.9rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:.6rem}
+.anno:last-child{border-bottom:none}
+.anno-num{width:20px;height:20px;background:var(--teal);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.anno-text{font-size:.8rem;color:#2E3E4A;line-height:1.55}
+.anno-text strong{color:var(--ink);font-weight:700}
+.callout-box{background:var(--amber2);border-left:3px solid var(--amber);padding:.9rem 1.1rem;font-size:.875rem;color:#3A2810;line-height:1.6;margin:1rem 0;max-width:72ch}
+.callout-box strong{color:var(--amber);font-weight:700}
 
-  /* ── NAV BAR ──────────────────────────────────────── */
-  .topnav {
-    background: var(--night);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topnav-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .topnav-inner::-webkit-scrollbar { display: none; }
-  .topnav a {
-    color: #7B8FA0;
-    text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    padding: 0.75rem 1rem;
-    white-space: nowrap;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .topnav a:hover {
-    color: #fff;
-    border-bottom-color: var(--teal);
-  }
+/* ── DATA JOURNEY ── */
+.journey{display:flex;flex-direction:column;gap:0;margin:2rem 0;position:relative}
+.journey::before{content:'';position:absolute;left:22px;top:28px;bottom:28px;width:2px;background:linear-gradient(to bottom,var(--teal),rgba(27,158,124,.2))}
+.jstep{display:flex;gap:1.25rem;padding-bottom:2rem;position:relative}
+.jstep:last-child{padding-bottom:0}
+.jnum{width:46px;height:46px;background:var(--teal);color:#fff;font-family:var(--ff-head);font-size:1.1rem;font-style:italic;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1}
+.jbody{padding-top:.35rem}
+.jbody h4{font-family:var(--ff-head);font-size:1.05rem;font-weight:normal;color:var(--ink);margin-bottom:.35rem}
+.jbody p{font-size:.88rem;color:#3A4E5C;max-width:58ch;line-height:1.65}
+.jbody code{font-family:var(--ff-code);font-size:.8rem;background:rgba(27,158,124,.1);color:var(--teal2);padding:.1rem .35rem}
 
-  /* ── MAIN LAYOUT ──────────────────────────────────── */
-  .content {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 2rem 6rem;
-  }
+/* ── FEATURES ── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin:2rem 0}
+@media(max-width:700px){.feat-grid{grid-template-columns:1fr}}
+.feat{background:var(--card);padding:1.35rem 1.5rem}
+.feat-name{font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+.feat-dot{width:8px;height:8px;background:var(--teal);flex-shrink:0}
+.feat-desc{font-size:.83rem;color:#3A4E5C;line-height:1.6}
 
-  /* ── SECTIONS ─────────────────────────────────────── */
-  .section {
-    padding: 4rem 0 0;
-    border-top: 1px solid var(--border);
-    margin-top: 4rem;
-  }
-  .section:first-child { border-top: none; margin-top: 3rem; }
+/* ── SETUP ── */
+.setup-steps{display:flex;flex-direction:column;gap:1.25rem;margin:2rem 0}
+.sstep{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.sstep-n{width:32px;height:32px;border:2px solid var(--teal);color:var(--teal);font-size:.85rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sstep-body h4{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:.5rem}
+.cmd{overflow-x:auto}
+.cmd pre{background:#0A1520;color:#C8D8E8;font-family:var(--ff-code);font-size:.8rem;padding:.85rem 1.1rem;line-height:1.65;white-space:pre}
+.creds-table{width:100%;max-width:500px;border-collapse:collapse;margin:1.5rem 0;font-size:.88rem}
+.creds-table th{text-align:left;font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--slate);border-bottom:2px solid var(--teal);padding:.5rem .75rem .5rem 0}
+.creds-table td{padding:.55rem .75rem .55rem 0;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+.creds-table td:last-child{font-family:var(--ff-code);font-size:.82rem;color:var(--teal2)}
+.rbadge{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.18rem .45rem}
+.radmin{background:rgba(212,137,42,.15);color:var(--amber)}
+.rres{background:rgba(27,158,124,.12);color:var(--teal2)}
 
-  .section-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--teal);
-    margin-bottom: 0.75rem;
-  }
-  .section > h2 {
-    font-family: var(--ff-display);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    font-weight: normal;
-    line-height: 1.25;
-    text-wrap: balance;
-    color: var(--night);
-    margin-bottom: 1.25rem;
-    max-width: 30ch;
-  }
-  .section > p, .section > .body-text p {
-    max-width: var(--measure);
-    color: #3A4A58;
-    margin-bottom: 1rem;
-  }
-  .lead {
-    font-size: 1.1rem;
-    color: #3A4A58;
-    max-width: var(--measure);
-    margin-bottom: 1.5rem;
-    line-height: 1.65;
-  }
+/* ── FOOTER ── */
+footer{background:var(--ink);color:#4A6070;padding:2.5rem 2rem;font-size:.8rem}
+footer .fi{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+footer strong{color:#7AB8A8;font-family:var(--ff-head);font-style:italic}
 
-  /* ── BIRD CARDS ───────────────────────────────────── */
-  .bird-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.25rem;
-    margin: 2rem 0;
-  }
-  .bird-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-    position: relative;
-  }
-  .bird-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px;
-    height: 100%;
-    background: var(--teal);
-  }
-  .bird-name {
-    font-family: var(--ff-display);
-    font-size: 1.15rem;
-    font-style: italic;
-    color: var(--night);
-    margin-bottom: 0.25rem;
-  }
-  .bird-tag {
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    color: var(--slate);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  .bird-stat { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
-  .bird-stat:last-child { border-bottom: none; }
-  .bird-stat-label { color: var(--slate); }
-  .bird-stat-val { font-weight: 600; color: var(--night); font-variant-numeric: tabular-nums; }
-
-  /* ── TECH STACK ───────────────────────────────────── */
-  .tech-list { display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0; }
-  .tech-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 1.5rem 1.75rem;
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 1.5rem;
-    align-items: start;
-  }
-  .tech-name-block { padding-top: 0.2rem; }
-  .tech-name {
-    font-family: var(--ff-display);
-    font-size: 1.1rem;
-    color: var(--night);
-    margin-bottom: 0.3rem;
-  }
-  .tech-badge {
-    display: inline-block;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    background: var(--amber-lt);
-    color: var(--amber);
-    padding: 0.2rem 0.5rem;
-  }
-  .tech-body h4 {
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--teal-dark);
-    margin-bottom: 0.4rem;
-    margin-top: 0.9rem;
-  }
-  .tech-body h4:first-child { margin-top: 0; }
-  .tech-body p { font-size: 0.9rem; color: #3A4A58; max-width: 55ch; margin-bottom: 0; }
-
-  /* ── ARCHITECTURE ─────────────────────────────────── */
-  .arch-diagram {
-    margin: 2rem 0;
-    background: var(--night);
-    padding: 2rem;
-    border-left: 4px solid var(--teal);
-  }
-  .arch-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
-  .arch-row:last-child { margin-bottom: 0; }
-  .arch-box {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: #C8D8E4;
-    font-size: 0.82rem;
-    font-family: var(--ff-code);
-    padding: 0.5rem 0.9rem;
-    white-space: nowrap;
-    min-width: 160px;
-    text-align: center;
-  }
-  .arch-box.highlight {
-    background: rgba(42,143,116,0.2);
-    border-color: var(--teal);
-    color: #A8D4C8;
-  }
-  .arch-arrow {
-    color: var(--slate);
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-  .arch-note {
-    font-size: 0.72rem;
-    color: var(--slate);
-    font-family: var(--ff-body);
-    margin-left: auto;
-    font-style: italic;
-  }
-
-  /* ── DATA FLOW ────────────────────────────────────── */
-  .flow-steps { display: flex; flex-direction: column; gap: 0; margin: 2rem 0; position: relative; }
-  .flow-steps::before {
-    content: '';
-    position: absolute;
-    left: 19px; top: 20px; bottom: 20px;
-    width: 2px;
-    background: var(--teal);
-    opacity: 0.3;
-  }
-  .flow-step { display: flex; gap: 1.25rem; padding: 0 0 1.75rem; align-items: flex-start; }
-  .flow-step:last-child { padding-bottom: 0; }
-  .flow-num {
-    width: 40px; height: 40px;
-    background: var(--teal);
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
-  }
-  .flow-body h4 {
-    font-family: var(--ff-display);
-    font-size: 1rem;
-    color: var(--night);
-    margin-bottom: 0.35rem;
-    padding-top: 0.4rem;
-  }
-  .flow-body p { font-size: 0.9rem; color: #3A4A58; max-width: 52ch; }
-
-  /* ── CODE BLOCKS ──────────────────────────────────── */
-  .code-section { margin: 2.5rem 0; }
-  .code-section h3 {
-    font-family: var(--ff-display);
-    font-size: 1.2rem;
-    font-weight: normal;
-    color: var(--night);
-    margin-bottom: 0.4rem;
-  }
-  .code-section p { font-size: 0.9rem; color: #3A4A58; max-width: 60ch; margin-bottom: 0.9rem; }
-  .code-wrap { overflow-x: auto; }
-  pre {
-    background: #0F1E30;
-    border-left: 3px solid var(--teal);
-    color: #C8D8E8;
-    font-family: var(--ff-code);
-    font-size: 0.82rem;
-    line-height: 1.65;
-    padding: 1.25rem 1.5rem;
-    white-space: pre;
-    tab-size: 4;
-  }
-  .kw  { color: #7EC8E3; }
-  .str { color: #A8D4A8; }
-  .cm  { color: #5A7A8A; font-style: italic; }
-  .fn  { color: #E8C87A; }
-  .dec { color: #D4A0D4; }
-  .num { color: #F0C878; }
-
-  .callout {
-    background: var(--amber-lt);
-    border-left: 3px solid var(--amber);
-    padding: 1rem 1.25rem;
-    margin: 1rem 0 1.5rem;
-    font-size: 0.88rem;
-    color: #4A3010;
-    max-width: var(--measure);
-  }
-  .callout strong { color: var(--amber); }
-
-  /* ── FEATURES ─────────────────────────────────────── */
-  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
-  .feature-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 1.25rem;
-  }
-  .feature-icon {
-    width: 36px; height: 36px;
-    background: var(--teal);
-    margin-bottom: 0.75rem;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .feature-icon svg { fill: #fff; width: 18px; height: 18px; }
-  .feature-card h4 { font-size: 0.9rem; font-weight: 600; color: var(--night); margin-bottom: 0.35rem; }
-  .feature-card p { font-size: 0.82rem; color: var(--slate); line-height: 1.5; }
-
-  /* ── CREDENTIALS TABLE ────────────────────────────── */
-  .creds-table { width: 100%; max-width: 480px; border-collapse: collapse; margin: 1.5rem 0; }
-  .creds-table th {
-    text-align: left;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--slate);
-    border-bottom: 2px solid var(--teal);
-    padding: 0.5rem 1rem 0.5rem 0;
-  }
-  .creds-table td {
-    padding: 0.6rem 1rem 0.6rem 0;
-    font-size: 0.88rem;
-    border-bottom: 1px solid var(--border);
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-  .creds-table td:last-child { font-family: var(--ff-code); font-size: 0.82rem; }
-  .role-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.5rem;
-  }
-  .role-admin { background: rgba(192,120,48,0.15); color: var(--amber); }
-  .role-res   { background: rgba(42,143,116,0.12); color: var(--teal-dark); }
-
-  /* ── FOOTER ───────────────────────────────────────── */
-  footer {
-    background: var(--night);
-    color: var(--slate);
-    padding: 2.5rem 2rem;
-    font-size: 0.82rem;
-    margin-top: 5rem;
-  }
-  footer .inner { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-  footer strong { color: #A8D4C8; font-family: var(--ff-display); font-style: italic; }
-
-  /* ── RESPONSIVE ───────────────────────────────────── */
-  @media (max-width: 600px) {
-    .tech-item { grid-template-columns: 1fr; }
-    .arch-row { flex-wrap: wrap; }
-    .arch-note { margin-left: 0; }
-    .hero-svg { display: none; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; animation: none !important; }
-  }
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media(max-width:700px){.hero-inner{grid-template-columns:1fr}.hero-birds{flex-direction:row;flex-wrap:wrap}}
 </style>
 
-<!-- HERO -->
-<header class="hero">
-  <div class="hero-inner">
-    <p class="hero-eyebrow">Complete Application Guide</p>
-    <h1>Tracking the <em>White Stork</em> Migration</h1>
-    <p class="hero-desc">A full walkthrough of the White Stork Migration Visualiser — what it does, how it's built, why every technology was chosen, and how to understand the code. Written for everyone.</p>
-    <div class="hero-pills">
-      <span class="pill">Python / Flask</span>
-      <span class="pill">MySQL</span>
-      <span class="pill">GPS Data</span>
-      <span class="pill">Interactive Maps</span>
-      <span class="pill">3 Birds Tracked</span>
-      <span class="pill">Portugal 2022</span>
-    </div>
-  </div>
-  <!-- Stork SVG silhouette -->
-  <svg class="hero-svg" width="420" height="340" viewBox="0 0 420 340" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Migration arc path -->
-    <path d="M 60 280 Q 180 40 380 80" stroke="white" stroke-width="1.5" fill="none" stroke-dasharray="8 5" opacity="0.6"/>
-    <!-- Stork body -->
-    <ellipse cx="340" cy="100" rx="38" ry="14" fill="white" transform="rotate(-20 340 100)"/>
-    <!-- Neck -->
-    <path d="M 355 88 Q 368 70 372 55" stroke="white" stroke-width="6" stroke-linecap="round" fill="none"/>
-    <!-- Head -->
-    <circle cx="373" cy="50" r="8" fill="white"/>
-    <!-- Beak -->
-    <path d="M 379 48 L 398 46" stroke="#C07830" stroke-width="4" stroke-linecap="round"/>
-    <!-- Wing left -->
-    <path d="M 335 95 Q 300 70 280 90 Q 310 95 335 105" fill="white" opacity="0.9"/>
-    <!-- Wing right -->
-    <path d="M 345 98 Q 375 75 395 88 Q 370 98 345 108" fill="white" opacity="0.7"/>
-    <!-- Legs -->
-    <path d="M 320 110 L 315 135" stroke="white" stroke-width="3" stroke-linecap="round"/>
-    <path d="M 330 112 L 326 137" stroke="white" stroke-width="3" stroke-linecap="round"/>
-    <!-- Dots for GPS points on path -->
-    <circle cx="60"  cy="280" r="4" fill="#2A8F74"/>
-    <circle cx="120" cy="210" r="3" fill="#2A8F74" opacity="0.7"/>
-    <circle cx="190" cy="148" r="3" fill="#2A8F74" opacity="0.7"/>
-    <circle cx="260" cy="106" r="3" fill="#2A8F74" opacity="0.7"/>
-  </svg>
-</header>
-
-<!-- STICKY NAV -->
-<nav class="topnav">
-  <div class="topnav-inner">
-    <a href="#what">What is it?</a>
-    <a href="#birds">The Birds</a>
+<!-- TOP NAV -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a href="#overview">Overview</a>
     <a href="#techstack">Tech Stack</a>
-    <a href="#architecture">Architecture</a>
-    <a href="#dataflow">Data Flow</a>
+    <a href="#howitworks">How It Works</a>
+    <a href="#datajourney">Data Journey</a>
     <a href="#code">Code Explained</a>
     <a href="#features">Features</a>
-    <a href="#howtorun">How to Run</a>
+    <a href="#setup">Setup</a>
   </div>
 </nav>
 
-<main class="content">
-
-  <!-- WHAT IS IT -->
-  <section class="section" id="what">
-    <p class="section-label">Overview</p>
-    <h2>What exactly is this application?</h2>
-    <p class="lead">The White Stork Migration Visualiser is a web application that tracks the real-life journeys of wild storks across the sky — showing where they flew, how fast, where they stopped, and what their GPS tags recorded along the way.</p>
-    <p>Think of it like Google Maps, but instead of tracking your own journey, it tracks the migration of white storks fitted with GPS tracking devices in Portugal in 2022. Scientists attach tiny GPS tags to birds. Every few hours, the tag records the bird's exact location, speed, altitude, and battery level — and sends it back via mobile network.</p>
-    <p>This application takes that raw data, processes it, stores it in a database, and presents it through a visual, interactive dashboard that anyone can explore through a web browser.</p>
-    <div class="callout">
-      <strong>In plain terms:</strong> A bird has a GPS tracker. The tracker sends data. This app collects that data, draws the bird's path on a map, and shows you stats about its journey — all accessible from a browser on any device.
-    </div>
-  </section>
-
-  <!-- THE BIRDS -->
-  <section class="section" id="birds">
-    <p class="section-label">The Data</p>
-    <h2>Meet the three tracked storks</h2>
-    <p class="lead">Three individual White Storks (<em>Ciconia ciconia</em>) were tracked in Portugal during May 2022, as part of the "White Stork Portugal Adults 2022" study. Each bird carries a GPS tag with its own ID.</p>
-    <div class="bird-grid">
-      <div class="bird-card">
-        <div class="bird-name">Castro_O284</div>
-        <div class="bird-tag">Tag ID 215284</div>
-        <div class="bird-stat"><span class="bird-stat-label">GPS fixes recorded</span><span class="bird-stat-val">30</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Total distance</span><span class="bird-stat-val">0.09 km</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Max speed</span><span class="bird-stat-val">1.0 km/h</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Max altitude</span><span class="bird-stat-val">173 m</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Dominant heading</span><span class="bird-stat-val">SE</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Tracked on</span><span class="bird-stat-val">8 May 2022</span></div>
-      </div>
-      <div class="bird-card">
-        <div class="bird-name">Mineiro_O283</div>
-        <div class="bird-tag">Tag ID 215283</div>
-        <div class="bird-stat"><span class="bird-stat-label">GPS fixes recorded</span><span class="bird-stat-val">30</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Total distance</span><span class="bird-stat-val">2.72 km</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Max speed</span><span class="bird-stat-val">45.0 km/h</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Max altitude</span><span class="bird-stat-val">605 m</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Dominant heading</span><span class="bird-stat-val">E</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Tracked on</span><span class="bird-stat-val">7–8 May 2022</span></div>
-      </div>
-      <div class="bird-card">
-        <div class="bird-name">Perneta_O285</div>
-        <div class="bird-tag">Tag ID 215285</div>
-        <div class="bird-stat"><span class="bird-stat-label">GPS fixes recorded</span><span class="bird-stat-val">30</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Total distance</span><span class="bird-stat-val">1.10 km</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Max speed</span><span class="bird-stat-val">18.0 km/h</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Max altitude</span><span class="bird-stat-val">184 m</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Dominant heading</span><span class="bird-stat-val">N</span></div>
-        <div class="bird-stat"><span class="bird-stat-label">Tracked on</span><span class="bird-stat-val">9 May 2022</span></div>
+<!-- HERO -->
+<header class="hero" id="overview">
+  <div class="hero-inner">
+    <div>
+      <p class="hero-eye">Application Guide — Complete Walkthrough</p>
+      <h1>White Stork<br><em>Migration Visualiser</em></h1>
+      <p class="hero-sub">A web application that tracks real GPS-tagged white storks across the sky — showing migration routes, stopovers, speed, altitude and more. Built with Python, Flask, and MySQL.</p>
+      <div class="hero-meta">
+        <span class="tag">Python 3.12</span>
+        <span class="tag">Flask 3.1</span>
+        <span class="tag">MySQL 8.0</span>
+        <span class="tag">GeoPandas</span>
+        <span class="tag">GeoJSON</span>
+        <span class="tag">Portugal 2022</span>
       </div>
     </div>
-    <p>Each GPS fix records 30 fields: location (lat/lon), speed, altitude, heading, battery %, satellite count, temperature, and even accelerometer readings that detect wing flaps vs. resting. In total the dataset has <strong>90 rows of GPS data</strong> across 30 columns.</p>
-  </section>
+    <div class="hero-birds">
+      <div class="hbird"><div class="hbird-name">Castro_O284</div><div class="hbird-stat">0.09 km · 173 m peak · SE</div></div>
+      <div class="hbird"><div class="hbird-name">Mineiro_O283</div><div class="hbird-stat">2.72 km · 605 m peak · E</div></div>
+      <div class="hbird"><div class="hbird-name">Perneta_O285</div><div class="hbird-stat">1.10 km · 184 m peak · N</div></div>
+    </div>
+  </div>
+</header>
 
-  <!-- TECH STACK -->
-  <section class="section" id="techstack">
-    <p class="section-label">Technology</p>
-    <h2>The tech stack — and why each piece was chosen</h2>
-    <p class="lead">Six technologies work together to make this app run. Here's what each one is, in plain English, and the specific reason it was used here.</p>
+<!-- WHAT IS IT -->
+<section class="sec" id="overview2">
+  <div class="sec-inner">
+    <p class="sec-label">What Is This</p>
+    <h2>A GPS bird tracker, visualised as a web app</h2>
+    <p class="lead">Scientists fit White Storks with tiny GPS tags. Every few hours the tag records the bird's exact position, speed, altitude, battery level — and sends it back over mobile network. This application takes that raw data, processes it, and displays it as an interactive map with stats and charts that anyone can explore in a browser.</p>
+    <p class="body-p">Think of it like Google Maps — but instead of tracking a car, it's tracking three individual storks across the Portuguese landscape in May 2022. The app lets you see where each bird flew, where it rested (stopovers), how fast it moved, and how high it climbed. It also has user login, an admin panel, and the ability to upload new data files.</p>
+    <div class="callout-box"><strong>In one line:</strong> Upload a GPS spreadsheet → the app draws the bird's route on a map, calculates stats, and shows it all through a secure web interface.</div>
+  </div>
+</section>
 
-    <div class="tech-list">
+<!-- TECH STACK -->
+<section class="sec alt" id="techstack">
+  <div class="sec-inner">
+    <p class="sec-label">Technology</p>
+    <h2>The tech stack — what each tool is and exactly why it's here</h2>
+    <p class="lead">Six technologies work together. Below is each one explained in plain English — what it is, and the specific reason it was chosen for this bird-tracking application (not a generic "it's popular" answer).</p>
 
-      <div class="tech-item">
-        <div class="tech-name-block">
-          <div class="tech-name">Python</div>
-          <span class="tech-badge">Language</span>
+    <div class="tech-grid">
+
+      <div class="tcard">
+        <div class="tcard-head">
+          <div class="tcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+          </div>
+          <div><div class="tcard-title">Python</div><span class="tcard-badge">Core Language</span></div>
         </div>
-        <div class="tech-body">
-          <h4>What it is</h4>
-          <p>Python is a programming language — the set of instructions the computer reads. Think of it as the language this entire application is written in, like English is the language of this document.</p>
-          <h4>Why we used it</h4>
-          <p>Python has the best scientific data tools available — pandas for spreadsheet-like data, geopandas for geographic (map) data, scipy for statistics. For a project that processes GPS coordinates and calculates migration routes, Python was the natural home.</p>
+        <div class="tcard-body">
+          <div>
+            <div class="tcard-what-label">What it is</div>
+            <div class="tcard-what">A programming language — the instructions the computer runs. The entire application is written in Python. Think of it as the "language" this app speaks, like English is the language of this document.</div>
+          </div>
+          <div class="tcard-why">
+            <div class="tcard-why-label">Why in THIS app</div>
+            Python has the world's best scientific data libraries — pandas, geopandas, scipy, movingpandas. GPS coordinate analysis, distance calculation on a curved Earth, detecting stopovers — all of this is built into Python libraries and would take months to build from scratch in another language.
+          </div>
         </div>
       </div>
 
-      <div class="tech-item">
-        <div class="tech-name-block">
-          <div class="tech-name">Flask</div>
-          <span class="tech-badge">Web Framework</span>
+      <div class="tcard">
+        <div class="tcard-head">
+          <div class="tcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div><div class="tcard-title">Flask</div><span class="tcard-badge">Web Framework</span></div>
         </div>
-        <div class="tech-body">
-          <h4>What it is</h4>
-          <p>Flask is a tool that turns a Python program into a website. Without Flask, Python can't respond to web browsers. Flask listens for requests (someone opens a page) and sends back the right content.</p>
-          <h4>Why we used it</h4>
-          <p>Flask is lightweight and gives full control — perfect for a focused academic project. It handles user login, page routing (which URL shows which page), and the API endpoints that feed data to the map. It doesn't force a heavy structure like larger frameworks would.</p>
-        </div>
-      </div>
-
-      <div class="tech-item">
-        <div class="tech-name-block">
-          <div class="tech-name">MySQL</div>
-          <span class="tech-badge">Database</span>
-        </div>
-        <div class="tech-body">
-          <h4>What it is</h4>
-          <p>MySQL is a database — a structured place to store information that can be searched, filtered, and retrieved fast. Think of it as a very organised filing cabinet that the application opens whenever it needs to look something up.</p>
-          <h4>Why we used it</h4>
-          <p>The app needs to store user accounts (with secure hashed passwords) and track uploaded files across sessions. MySQL is mature, reliable, and well-supported. It pairs naturally with Flask via SQLAlchemy, which lets Python talk to the database without writing raw SQL queries.</p>
+        <div class="tcard-body">
+          <div>
+            <div class="tcard-what-label">What it is</div>
+            <div class="tcard-what">A tool that turns a Python script into a website. Without Flask, Python has no way to respond to a web browser. Flask listens on a port, receives requests ("give me the dashboard"), and sends back the right HTML or data.</div>
+          </div>
+          <div class="tcard-why">
+            <div class="tcard-why-label">Why in THIS app</div>
+            Flask is lightweight — it doesn't force a heavy project structure. For an academic project with 19 specific routes (login, map, admin, 6 API endpoints), Flask gives total control without boilerplate overhead. It also has Flask-Login and Flask-SQLAlchemy built in, which handle authentication and the database connection.
+          </div>
         </div>
       </div>
 
-      <div class="tech-item">
-        <div class="tech-name-block">
-          <div class="tech-name">Pandas &amp; GeoPandas</div>
-          <span class="tech-badge">Data Processing</span>
+      <div class="tcard">
+        <div class="tcard-head">
+          <div class="tcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 3C7.58 3 4 4.79 4 7s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4zM4 9v3c0 2.21 3.58 4 8 4s8-1.79 8-4V9c0 2.21-3.58 4-8 4S4 11.21 4 9zm0 5v3c0 2.21 3.58 4 8 4s8-1.79 8-4v-3c0 2.21-3.58 4-8 4s-8-1.79-8-4z"/></svg>
+          </div>
+          <div><div class="tcard-title">MySQL</div><span class="tcard-badge">Database</span></div>
         </div>
-        <div class="tech-body">
-          <h4>What it is</h4>
-          <p>Pandas is like Excel inside Python — it reads spreadsheets, filters rows, calculates averages. GeoPandas is the same thing but for geographic data — it understands coordinates and can measure distances on the Earth's surface.</p>
-          <h4>Why we used it</h4>
-          <p>The raw stork data arrives as an Excel file. Pandas reads it, cleans it, and turns it into usable tables. GeoPandas then works out actual distances between GPS points on the curved surface of the Earth (not just straight-line subtraction).</p>
-        </div>
-      </div>
-
-      <div class="tech-item">
-        <div class="tech-name-block">
-          <div class="tech-name">GeoJSON</div>
-          <span class="tech-badge">Map Format</span>
-        </div>
-        <div class="tech-body">
-          <h4>What it is</h4>
-          <p>GeoJSON is a file format specifically designed to store geographic shapes — points, lines, and areas — in a way that mapping tools can read. It's just a text file with coordinates formatted in a special way.</p>
-          <h4>Why we used it</h4>
-          <p>The migration tracks (the paths the birds flew) need to be drawn on a map. GeoJSON is the standard format for this — all modern map libraries like Leaflet and Mapbox understand it natively. The app converts processed GPS data into GeoJSON files so the frontend map can draw the routes.</p>
+        <div class="tcard-body">
+          <div>
+            <div class="tcard-what-label">What it is</div>
+            <div class="tcard-what">A database — a structured filing cabinet that stores information the app needs to remember across sessions (users, passwords, uploaded files). Without it, logging in would be impossible — data would reset every time the app restarts.</div>
+          </div>
+          <div class="tcard-why">
+            <div class="tcard-why-label">Why in THIS app</div>
+            The app needs to store user accounts securely (bcrypt-hashed passwords), track which files each user uploaded, and support two roles (admin vs researcher) with different access. MySQL stores this reliably. It pairs with SQLAlchemy so Python talks to it without raw SQL — models.py describes the tables as Python classes.
+          </div>
         </div>
       </div>
 
-      <div class="tech-item">
-        <div class="tech-name-block">
-          <div class="tech-name">HTML / CSS / JavaScript</div>
-          <span class="tech-badge">Frontend</span>
+      <div class="tcard">
+        <div class="tcard-head">
+          <div class="tcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 3h18v4H3zm0 5h18v4H3zm0 5h18v4H3zm0 5h18v4H3z" opacity=".3"/><path d="M3 4h4v2H3zm0 4h8v2H3zm0 4h6v2H3zm0 4h10v2H3z"/></svg>
+          </div>
+          <div><div class="tcard-title">Pandas &amp; GeoPandas</div><span class="tcard-badge">Data Processing</span></div>
         </div>
-        <div class="tech-body">
-          <h4>What it is</h4>
-          <p>These three languages build what you see in the browser. HTML is the structure (the skeleton), CSS is the styling (colours, layout, fonts), and JavaScript is the behaviour (what happens when you click a button, how the map responds).</p>
-          <h4>Why we used it</h4>
-          <p>Every website uses these — there's no alternative for browser-based interfaces. The app's JavaScript (app.js, charts.js) fetches data from the Flask API and renders it on the map and in charts without reloading the page.</p>
+        <div class="tcard-body">
+          <div>
+            <div class="tcard-what-label">What it is</div>
+            <div class="tcard-what">Pandas is Excel inside Python — reads spreadsheets, filters rows, calculates means. GeoPandas is the same but understands coordinates — it can measure real distances on the curved surface of the Earth, not just subtract numbers.</div>
+          </div>
+          <div class="tcard-why">
+            <div class="tcard-why-label">Why in THIS app</div>
+            The raw stork data is an Excel file with 99 rows × 30 columns. Pandas reads and cleans it in two lines. GeoPandas groups fixes by bird, sorts by timestamp, and uses Haversine geometry to measure actual flight distances. Without this, calculating "Mineiro flew 2.72 km" would require writing the spherical geometry math from scratch.
+          </div>
+        </div>
+      </div>
+
+      <div class="tcard">
+        <div class="tcard-head">
+          <div class="tcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div><div class="tcard-title">GeoJSON</div><span class="tcard-badge">Map Format</span></div>
+        </div>
+        <div class="tcard-body">
+          <div>
+            <div class="tcard-what-label">What it is</div>
+            <div class="tcard-what">A text file format for storing geographic data — points, lines, and shapes with coordinates. Not a library or language, just a standard format. A GeoJSON file is just JSON with coordinates in a specific structure that maps understand.</div>
+          </div>
+          <div class="tcard-why">
+            <div class="tcard-why-label">Why in THIS app</div>
+            The frontend map needs to draw the bird tracks. GeoJSON is the universal language all JavaScript map libraries speak natively. preprocess.py converts the Excel GPS data into four GeoJSON files (tracks, stopovers, stats, timeline) — these are read by the browser to draw lines and markers without any further calculation.
+          </div>
+        </div>
+      </div>
+
+      <div class="tcard">
+        <div class="tcard-head">
+          <div class="tcard-icon">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+          </div>
+          <div><div class="tcard-title">HTML / CSS / JS</div><span class="tcard-badge">Frontend</span></div>
+        </div>
+        <div class="tcard-body">
+          <div>
+            <div class="tcard-what-label">What it is</div>
+            <div class="tcard-what">The three languages every browser runs. HTML is the structure (the skeleton of each page), CSS is the styling (colours, layout), JavaScript is the behaviour (map interactions, chart updates, button clicks).</div>
+          </div>
+          <div class="tcard-why">
+            <div class="tcard-why-label">Why in THIS app</div>
+            The map page fetches GeoJSON from Flask's API via JavaScript without reloading — users can click a bird name and the map updates instantly. app.js calls /api/tracks, /api/stats etc. and passes results to a map library. charts.js draws the speed and altitude timelines. Jinja2 (Flask's template engine) fills in dynamic values like the logged-in username.
+          </div>
         </div>
       </div>
 
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ARCHITECTURE -->
-  <section class="section" id="architecture">
-    <p class="section-label">System Design</p>
-    <h2>How all the pieces connect</h2>
-    <p class="lead">The application follows a classic three-layer architecture — a browser at the front, a Python server in the middle, and a database at the back. Here's how a request travels through the system.</p>
+<!-- HOW IT WORKS -->
+<section class="sec" id="howitworks">
+  <div class="sec-inner">
+    <p class="sec-label">Architecture</p>
+    <h2>How all the pieces connect and talk to each other</h2>
+    <p class="lead">The application has three layers — browser, server, and storage. Here is exactly how a request travels from the moment you open the app to the moment you see a bird's track on the map.</p>
 
-    <div class="arch-diagram">
-      <div class="arch-row">
-        <div class="arch-box highlight">Browser (User)</div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box">HTTP Request</div>
-        <div class="arch-note">User opens localhost:5000</div>
+    <div class="flow-cols">
+      <div class="flow-col-box">
+        <div class="flow-col-num">1</div>
+        <div class="flow-col-title">Browser sends a request</div>
+        <div class="flow-col-body">You open <code style="font-size:.78rem;background:rgba(27,158,124,.1);color:#147A5E;padding:.1rem .3rem">localhost:5000/map</code>. The browser sends an HTTP request to the Flask server running on your computer.</div>
       </div>
-      <div class="arch-row">
-        <div class="arch-box">Flask Router</div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box">Route Handler</div>
-        <div class="arch-note">app.py decides which function runs</div>
+      <div class="flow-col-box">
+        <div class="flow-col-num">2</div>
+        <div class="flow-col-title">Flask routes it</div>
+        <div class="flow-col-body">app.py sees the URL <code style="font-size:.78rem;background:rgba(27,158,124,.1);color:#147A5E;padding:.1rem .3rem">/map</code>, checks you're logged in (Flask-Login), runs the <code style="font-size:.78rem;background:rgba(27,158,124,.1);color:#147A5E;padding:.1rem .3rem">map_view()</code> function, and sends back the map.html template.</div>
       </div>
-      <div class="arch-row">
-        <div class="arch-box">Python Logic</div>
-        <div class="arch-arrow">⇄</div>
-        <div class="arch-box highlight">MySQL Database</div>
-        <div class="arch-note">models.py — reads/writes users &amp; files</div>
-      </div>
-      <div class="arch-row">
-        <div class="arch-box">GeoJSON Files</div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box">API Response (JSON)</div>
-        <div class="arch-note">static/geojson/ — pre-processed map data</div>
-      </div>
-      <div class="arch-row">
-        <div class="arch-box">HTML Template</div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box highlight">Browser renders page</div>
-        <div class="arch-note">templates/ — Jinja2 fills in dynamic values</div>
+      <div class="flow-col-box">
+        <div class="flow-col-num">3</div>
+        <div class="flow-col-title">JS fetches the data</div>
+        <div class="flow-col-body">The map page loads. JavaScript calls <code style="font-size:.78rem;background:rgba(27,158,124,.1);color:#147A5E;padding:.1rem .3rem">/api/tracks</code>. Flask reads <code style="font-size:.78rem;background:rgba(27,158,124,.1);color:#147A5E;padding:.1rem .3rem">tracks.geojson</code> and returns it as JSON. JS draws the bird paths on the map.</div>
       </div>
     </div>
 
-    <p>The project folder structure mirrors this architecture exactly:</p>
-    <div class="code-wrap">
-<pre>birdtrecking/
+    <p class="body-p" style="margin-top:1.5rem">The folder structure maps directly onto this architecture:</p>
+    <div class="code-block" style="margin-top:1rem">
+      <div class="code-block-head"><span class="code-block-title">Project Structure</span><span class="code-block-file">birdtrecking/</span></div>
+      <div style="overflow-x:auto">
+<pre style="background:#0A1520;color:#C8D8E8;font-family:'Courier New',monospace;font-size:.8rem;padding:1.25rem 1.5rem;line-height:1.8">birdtrecking/
 ├── backend/
-│   ├── <span class="fn">app.py</span>          <span class="cm">← The server. All routes live here.</span>
-│   ├── <span class="fn">models.py</span>       <span class="cm">← Database table definitions.</span>
-│   ├── <span class="fn">preprocess.py</span>   <span class="cm">← Converts Excel → GeoJSON + stats.</span>
-│   └── <span class="fn">analysis.py</span>     <span class="cm">← Calculates distances, stopovers, speed.</span>
+│   ├── <span class="fn">app.py</span>          <span class="cm">← The server. All 19 routes live here.</span>
+│   ├── <span class="fn">models.py</span>       <span class="cm">← Database table definitions (User, UploadedFile).</span>
+│   ├── <span class="fn">preprocess.py</span>   <span class="cm">← Converts data.xlsx → GeoJSON + stats files.</span>
+│   └── <span class="fn">analysis.py</span>     <span class="cm">← Calculates distances, stopovers, headings.</span>
 ├── data/
-│   └── <span class="str">data.xlsx</span>       <span class="cm">← The raw GPS data from the bird tags.</span>
+│   └── <span class="str">data.xlsx</span>       <span class="cm">← Raw GPS data: 99 rows × 30 columns.</span>
 ├── static/
-│   ├── geojson/        <span class="cm">← Processed map data (tracks, stopovers).</span>
+│   ├── geojson/        <span class="cm">← tracks.geojson, stopovers.geojson, stats.json, timeline.json</span>
 │   ├── css/style.css   <span class="cm">← All visual styling.</span>
-│   └── js/             <span class="cm">← Map rendering + chart drawing.</span>
-├── templates/          <span class="cm">← HTML page layouts.</span>
-└── stork_db.sql        <span class="cm">← Database snapshot for easy setup.</span></pre>
+│   └── js/             <span class="cm">← app.js (map) + charts.js (timelines).</span>
+├── templates/          <span class="cm">← login.html, dashboard.html, map.html, admin.html …</span>
+└── stork_db.sql        <span class="cm">← Database snapshot — import this to get started instantly.</span></pre>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- DATA FLOW -->
-  <section class="section" id="dataflow">
-    <p class="section-label">The Journey of Data</p>
-    <h2>From GPS tag on a bird to dot on a map</h2>
-    <p class="lead">Raw data goes through five transformation steps before you see a line drawn on the map. Here's each step explained simply.</p>
+<!-- DATA JOURNEY -->
+<section class="sec alt" id="datajourney">
+  <div class="sec-inner">
+    <p class="sec-label">Data Pipeline</p>
+    <h2>From GPS tag on a bird's back to a dot on the map</h2>
+    <p class="lead">Raw GPS data goes through five clear transformation steps before you see anything on screen. Each step is handled by a different part of the codebase.</p>
 
-    <div class="flow-steps">
-      <div class="flow-step">
-        <div class="flow-num">1</div>
-        <div class="flow-body">
+    <div class="journey">
+      <div class="jstep">
+        <div class="jnum">1</div>
+        <div class="jbody">
           <h4>GPS tag records a fix</h4>
-          <p>Every few hours the tag on the stork's back locks onto satellites and records: latitude, longitude, altitude, speed, heading, battery level, and temperature. This happens automatically — the bird doesn't even notice.</p>
+          <p>Every 1–4 hours, the backpack-mounted GPS tag on the stork locks onto satellites and records 30 values: latitude, longitude, altitude above sea level, ground speed, heading (compass direction), battery %, satellite count, accelerometer readings (detects wing flaps vs resting), external temperature, and more. The bird feels nothing — the tag weighs under 25g.</p>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">2</div>
-        <div class="flow-body">
-          <h4>Data arrives as an Excel file</h4>
-          <p>The tag transmits data via mobile network to a research database (Movebank). Scientists export it as <code>data.xlsx</code> — a spreadsheet with 99 rows and 30 columns. This file lives in the <code>data/</code> folder.</p>
+      <div class="jstep">
+        <div class="jnum">2</div>
+        <div class="jbody">
+          <h4>Tag transmits data via mobile network → Movebank → Excel file</h4>
+          <p>The tag sends each fix via GSM (mobile network) to the Movebank animal tracking database. Researchers export the data as <code>data.xlsx</code> — a spreadsheet with 99 rows (30 fixes per bird × 3 birds = 90 data rows + headers). This file is placed in the app's <code>data/</code> folder.</p>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">3</div>
-        <div class="flow-body">
-          <h4>preprocess.py transforms it</h4>
-          <p>When the app starts for the first time, <code>preprocess.py</code> reads the Excel file using pandas, groups fixes by bird, calculates distances and stopovers using GeoPandas, then writes out four output files: <code>tracks.geojson</code>, <code>stopovers.geojson</code>, <code>stats.json</code>, and <code>timeline.json</code>. These are saved and reused — the heavy calculation only runs once.</p>
+      <div class="jstep">
+        <div class="jnum">3</div>
+        <div class="jbody">
+          <h4>preprocess.py reads, cleans, and transforms the data</h4>
+          <p>When the app starts for the first time, <code>preprocess.py</code> runs automatically. It reads the Excel file with pandas, converts coordinates to a GeoPandas dataframe, groups fixes by bird name, sorts each group by timestamp, connects points into lines, detects stopovers (clusters where the bird barely moved), and calculates stats. It writes four output files to <code>static/geojson/</code>: <code>tracks.geojson</code>, <code>stopovers.geojson</code>, <code>stats.json</code>, <code>timeline.json</code>. These are reused on every subsequent run — the heavy calculation only happens once.</p>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">4</div>
-        <div class="flow-body">
-          <h4>Flask serves the data via API</h4>
-          <p>When the browser opens the map page, JavaScript calls API endpoints like <code>/api/tracks</code> and <code>/api/stats</code>. Flask reads the GeoJSON files and returns them as JSON responses — like a waiter bringing food from the kitchen to your table.</p>
+      <div class="jstep">
+        <div class="jnum">4</div>
+        <div class="jbody">
+          <h4>Flask API serves the processed files on demand</h4>
+          <p>When a user opens the map page, the browser's JavaScript calls Flask API endpoints: <code>/api/tracks</code>, <code>/api/stopovers</code>, <code>/api/stats</code>, <code>/api/timeline</code>. Each endpoint simply opens the corresponding GeoJSON file and returns it as a JSON response. This separation means the browser only downloads the data it needs, when it needs it — not everything at once.</p>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">5</div>
-        <div class="flow-body">
-          <h4>JavaScript draws it on the map</h4>
-          <p>The browser's JavaScript receives the GeoJSON and uses a map library to draw the migration routes as lines on an interactive map, place markers at stopovers, and render charts for speed and altitude. The user can click, zoom, and explore.</p>
+      <div class="jstep">
+        <div class="jnum">5</div>
+        <div class="jbody">
+          <h4>JavaScript draws it on the interactive map</h4>
+          <p>The browser receives the GeoJSON and uses a JavaScript map library to render bird tracks as coloured lines, stopovers as clickable circle markers, and individual GPS fixes as smaller dots. <code>charts.js</code> renders speed and altitude over time as line charts. Everything updates dynamically — clicking a bird name filters the map to show only that bird without reloading the page.</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CODE EXPLAINED -->
-  <section class="section" id="code">
-    <p class="section-label">Under the Hood</p>
-    <h2>Key code explained in plain English</h2>
-    <p class="lead">You don't need to be a programmer to follow these explanations. Each snippet is the actual code from the app, broken down line by line.</p>
+<!-- CODE EXPLAINED -->
+<section class="sec" id="code">
+  <div class="sec-inner">
+    <p class="sec-label">Code Walkthrough</p>
+    <h2>The key code, explained line by line</h2>
+    <p class="lead">Four real code snippets from the application — each shown with annotations explaining exactly what each line does and why it was written that way. No assumed knowledge.</p>
 
-    <div class="code-section">
-      <h3>1. How a page route works (app.py)</h3>
-      <p>A "route" is the link between a URL and a Python function. When someone visits <code>/dashboard</code>, Flask knows exactly which function to run.</p>
-      <div class="code-wrap">
-<pre><span class="dec">@app.route</span>(<span class="str">'/dashboard'</span>)
-<span class="dec">@login_required</span>
-<span class="kw">def</span> <span class="fn">dashboard</span>():
-    files = UploadedFile.query.<span class="fn">filter_by</span>(
-        uploaded_by=current_user.id
-    ).<span class="fn">all</span>()
-    <span class="kw">return</span> <span class="fn">render_template</span>(<span class="str">'dashboard.html'</span>, files=files)</pre>
-      </div>
-      <div class="callout">
-        <strong>Line by line:</strong> <code>@app.route('/dashboard')</code> — "when someone visits /dashboard, run this function." <code>@login_required</code> — "but only if they're logged in — otherwise redirect to login." The function fetches that user's uploaded files from the database, then sends the dashboard HTML page with those files included.
+    <!-- CODE 1 -->
+    <div class="code-block" style="margin-top:2.5rem">
+      <div class="code-block-head"><span class="code-block-title">1 — How a Route Works</span><span class="code-block-file">backend/app.py · line 141</span></div>
+      <div class="code-annotated">
+        <div class="code-pane">
+<pre><span class="ln">1</span><span class="dec">@app.route</span>(<span class="str">'/dashboard'</span>)
+<span class="ln">2</span><span class="dec">@login_required</span>
+<span class="ln">3</span><span class="kw">def</span> <span class="fn">dashboard</span>():
+<span class="ln">4</span>    files <span class="op">=</span> UploadedFile.query
+<span class="ln">5</span>             .<span class="fn">filter_by</span>(
+<span class="ln">6</span>                 uploaded_by<span class="op">=</span>current_user.id
+<span class="ln">7</span>             ).<span class="fn">all</span>()
+<span class="ln">8</span>    <span class="kw">return</span> <span class="fn">render_template</span>(
+<span class="ln">9</span>        <span class="str">'dashboard.html'</span>,
+<span class="ln">10</span>        files<span class="op">=</span>files
+<span class="ln">11</span>    )</pre>
+        </div>
+        <div class="anno-pane">
+          <div class="anno"><div class="anno-num">1</div><div class="anno-text"><strong>@app.route('/dashboard')</strong> — This "decorator" tells Flask: whenever someone visits the URL /dashboard, run the function below. It's like registering a phone number to a person.</div></div>
+          <div class="anno"><div class="anno-num">2</div><div class="anno-text"><strong>@login_required</strong> — Before running anything, Flask-Login checks if the user has a valid session cookie. If not logged in, they're redirected to /login automatically. No manual check needed.</div></div>
+          <div class="anno"><div class="anno-num">3</div><div class="anno-text"><strong>def dashboard()</strong> — The Python function that runs when the route matches. The name doesn't matter to the URL — only the @app.route string does.</div></div>
+          <div class="anno"><div class="anno-num">4–7</div><div class="anno-text"><strong>UploadedFile.query.filter_by(...).all()</strong> — SQLAlchemy translates this to SQL: "SELECT * FROM uploaded_files WHERE uploaded_by = [current user's id]". Returns a Python list of file objects.</div></div>
+          <div class="anno"><div class="anno-num">8–11</div><div class="anno-text"><strong>render_template(...)</strong> — Opens templates/dashboard.html, fills in Jinja2 placeholders like <code>&#123;&#123; files &#125;&#125;</code> with the real Python data, and sends the complete HTML to the browser.</div></div>
+        </div>
       </div>
     </div>
 
-    <div class="code-section">
-      <h3>2. How the database model works (models.py)</h3>
-      <p>A "model" is a Python class that describes a database table. Instead of writing SQL by hand, we describe the table in Python and SQLAlchemy creates it automatically.</p>
-      <div class="code-wrap">
-<pre><span class="kw">class</span> <span class="fn">User</span>(db.Model, UserMixin):
-    id         = db.Column(db.Integer, primary_key=<span class="kw">True</span>)
-    username   = db.Column(db.String(<span class="num">80</span>), unique=<span class="kw">True</span>, nullable=<span class="kw">False</span>)
-    email      = db.Column(db.String(<span class="num">120</span>), unique=<span class="kw">True</span>)
-    password   = db.Column(db.String(<span class="num">255</span>), nullable=<span class="kw">False</span>)
-    role       = db.Column(db.String(<span class="num">20</span>), default=<span class="str">'researcher'</span>)
-
-    <span class="kw">def</span> <span class="fn">set_password</span>(self, raw_password):
-        self.password = bcrypt.<span class="fn">generate_password_hash</span>(raw_password)
-
-    <span class="kw">def</span> <span class="fn">check_password</span>(self, raw_password):
-        <span class="kw">return</span> bcrypt.<span class="fn">check_password_hash</span>(self.password, raw_password)</pre>
-      </div>
-      <div class="callout">
-        <strong>Plain English:</strong> This creates a "users" table with columns for id, username, email, password, and role. Crucially, passwords are <em>never stored as plain text</em> — <code>bcrypt</code> scrambles them into a hash. Even if someone stole the database, they couldn't read the passwords. <code>check_password</code> verifies a login by re-scrambling the typed password and comparing the hashes.
+    <!-- CODE 2 -->
+    <div class="code-block" style="margin-top:2.5rem">
+      <div class="code-block-head"><span class="code-block-title">2 — How the Database Model Works</span><span class="code-block-file">backend/models.py · line 12</span></div>
+      <div class="code-annotated">
+        <div class="code-pane">
+<pre><span class="ln">1</span><span class="kw">class</span> <span class="fn">User</span>(db.Model, UserMixin):
+<span class="ln">2</span>    id       <span class="op">=</span> db.Column(db.Integer,
+<span class="ln">3</span>                         primary_key<span class="op">=</span><span class="kw">True</span>)
+<span class="ln">4</span>    username <span class="op">=</span> db.Column(db.String(<span class="num">80</span>),
+<span class="ln">5</span>                         unique<span class="op">=</span><span class="kw">True</span>,
+<span class="ln">6</span>                         nullable<span class="op">=</span><span class="kw">False</span>)
+<span class="ln">7</span>    password <span class="op">=</span> db.Column(db.String(<span class="num">255</span>))
+<span class="ln">8</span>    role     <span class="op">=</span> db.Column(db.String(<span class="num">20</span>),
+<span class="ln">9</span>                         default<span class="op">=</span><span class="str">'researcher'</span>)
+<span class="ln">10</span>
+<span class="ln">11</span>   <span class="kw">def</span> <span class="fn">set_password</span>(self, raw):
+<span class="ln">12</span>       self.password <span class="op">=</span> bcrypt
+<span class="ln">13</span>           .<span class="fn">generate_password_hash</span>(raw)
+<span class="ln">14</span>           .<span class="fn">decode</span>(<span class="str">'utf-8'</span>)
+<span class="ln">15</span>
+<span class="ln">16</span>   <span class="kw">def</span> <span class="fn">check_password</span>(self, raw):
+<span class="ln">17</span>       <span class="kw">return</span> bcrypt.<span class="fn">check_password_hash</span>(
+<span class="ln">18</span>           self.password, raw
+<span class="ln">19</span>       )</pre>
+        </div>
+        <div class="anno-pane">
+          <div class="anno"><div class="anno-num">1</div><div class="anno-text"><strong>class User(db.Model)</strong> — This Python class IS the database table. SQLAlchemy reads this and creates a table called "users" in MySQL automatically. No SQL CREATE TABLE needed.</div></div>
+          <div class="anno"><div class="anno-num">2–6</div><div class="anno-text"><strong>db.Column(...)</strong> — Each line is a column in the table. <code>primary_key=True</code> makes id the unique row identifier. <code>unique=True</code> on username means no two users can share a username — MySQL enforces this at the database level.</div></div>
+          <div class="anno"><div class="anno-num">8–9</div><div class="anno-text"><strong>default='researcher'</strong> — When a new user registers, their role is automatically set to 'researcher'. Only an admin can manually change it to 'admin'. This prevents privilege escalation at signup.</div></div>
+          <div class="anno"><div class="anno-num">11–14</div><div class="anno-text"><strong>set_password()</strong> — Passwords are NEVER stored as plain text. bcrypt scrambles "admin123" into a 60-character hash like <code>$2b$12$l.J1lW...</code>. Even if the database is stolen, the real password cannot be read back from the hash.</div></div>
+          <div class="anno"><div class="anno-num">16–19</div><div class="anno-text"><strong>check_password()</strong> — At login, bcrypt hashes what the user typed and compares it to the stored hash. If they match, login succeeds. The original password is never decrypted — it doesn't need to be.</div></div>
+        </div>
       </div>
     </div>
 
-    <div class="code-section">
-      <h3>3. How GPS data becomes map-ready (preprocess.py)</h3>
-      <p>This is where raw spreadsheet data is transformed into the GeoJSON format that the map understands.</p>
-      <div class="code-wrap">
-<pre><span class="kw">def</span> <span class="fn">run_preprocessing</span>(xlsx_path):
-    df = pd.<span class="fn">read_excel</span>(xlsx_path)          <span class="cm"># Read the Excel file</span>
-
-    gdf = gpd.<span class="fn">GeoDataFrame</span>(df,             <span class="cm"># Convert to geographic dataframe</span>
-        geometry=gpd.<span class="fn">points_from_xy</span>(
-            df[<span class="str">'location-long'</span>],
-            df[<span class="str">'location-lat'</span>]
-        )
-    )
-
-    <span class="kw">for</span> bird_id, group <span class="kw">in</span> gdf.<span class="fn">groupby</span>(<span class="str">'individual-local-identifier'</span>):
-        track = group.<span class="fn">sort_values</span>(<span class="str">'timestamp'</span>)
-        line = LineString(track.geometry.<span class="fn">tolist</span>())
-        tracks_features.<span class="fn">append</span>({
-            <span class="str">"type"</span>: <span class="str">"Feature"</span>,
-            <span class="str">"properties"</span>: {<span class="str">"bird_id"</span>: bird_id},
-            <span class="str">"geometry"</span>: <span class="fn">mapping</span>(line)
-        })</pre>
-      </div>
-      <div class="callout">
-        <strong>What's happening:</strong> We read the Excel file, then tell GeoPandas that the <code>location-long</code> and <code>location-lat</code> columns are GPS coordinates. We then group all rows by bird name, sort them by time (so the line goes in the right direction), connect all the points into a line, and save it as a GeoJSON "Feature" — exactly the format a map library expects.
+    <!-- CODE 3 -->
+    <div class="code-block" style="margin-top:2.5rem">
+      <div class="code-block-head"><span class="code-block-title">3 — How GPS Data Becomes a Map Track</span><span class="code-block-file">backend/preprocess.py · line 58</span></div>
+      <div class="code-annotated">
+        <div class="code-pane">
+<pre><span class="ln">1</span>df <span class="op">=</span> pd.<span class="fn">read_excel</span>(xlsx_path)
+<span class="ln">2</span>
+<span class="ln">3</span>gdf <span class="op">=</span> gpd.<span class="fn">GeoDataFrame</span>(df,
+<span class="ln">4</span>    geometry<span class="op">=</span>gpd.<span class="fn">points_from_xy</span>(
+<span class="ln">5</span>        df[<span class="str">'location-long'</span>],
+<span class="ln">6</span>        df[<span class="str">'location-lat'</span>]
+<span class="ln">7</span>    ),
+<span class="ln">8</span>    crs<span class="op">=</span><span class="str">"EPSG:4326"</span>
+<span class="ln">9</span>)
+<span class="ln">10</span>
+<span class="ln">11</span><span class="kw">for</span> bird_id, group <span class="kw">in</span> gdf.<span class="fn">groupby</span>(
+<span class="ln">12</span>    <span class="str">'individual-local-identifier'</span>
+<span class="ln">13</span>):
+<span class="ln">14</span>    track <span class="op">=</span> group.<span class="fn">sort_values</span>(<span class="str">'timestamp'</span>)
+<span class="ln">15</span>    line  <span class="op">=</span> <span class="fn">LineString</span>(
+<span class="ln">16</span>        track.geometry.<span class="fn">tolist</span>()
+<span class="ln">17</span>    )
+<span class="ln">18</span>    tracks.<span class="fn">append</span>({
+<span class="ln">19</span>        <span class="str">"type"</span>: <span class="str">"Feature"</span>,
+<span class="ln">20</span>        <span class="str">"properties"</span>: {<span class="str">"bird_id"</span>: bird_id},
+<span class="ln">21</span>        <span class="str">"geometry"</span>: <span class="fn">mapping</span>(line)
+<span class="ln">22</span>    })</pre>
+        </div>
+        <div class="anno-pane">
+          <div class="anno"><div class="anno-num">1</div><div class="anno-text"><strong>pd.read_excel()</strong> — Opens data.xlsx and loads all 99 rows into memory as a pandas DataFrame — essentially an in-memory spreadsheet. One line replaces hundreds of lines of file-parsing code.</div></div>
+          <div class="anno"><div class="anno-num">3–9</div><div class="anno-text"><strong>GeoDataFrame + points_from_xy()</strong> — Converts the plain number columns <code>location-long</code> and <code>location-lat</code> into actual geometric Point objects that understand Earth's coordinate system. <code>crs="EPSG:4326"</code> declares this is WGS84 — the same system as GPS satellites use.</div></div>
+          <div class="anno"><div class="anno-num">11–13</div><div class="anno-text"><strong>groupby()</strong> — Splits all 90 data rows into 3 groups, one per bird name (Castro_O284, Mineiro_O283, Perneta_O285). The loop runs once per bird.</div></div>
+          <div class="anno"><div class="anno-num">14</div><div class="anno-text"><strong>sort_values('timestamp')</strong> — Critical step. GPS fixes arrive in any order. Sorting by time ensures the line is drawn in the correct direction of travel — not zigzagging back and forth randomly.</div></div>
+          <div class="anno"><div class="anno-num">15–22</div><div class="anno-text"><strong>LineString → GeoJSON Feature</strong> — Connects all the sorted points into a single line geometry, then wraps it in the GeoJSON Feature format that map libraries expect. This is what becomes one coloured track on the map.</div></div>
+        </div>
       </div>
     </div>
 
-    <div class="code-section">
-      <h3>4. How the API endpoint works (app.py)</h3>
-      <p>The map page fetches data dynamically — JavaScript calls an API and gets back JSON. Here's that endpoint.</p>
-      <div class="code-wrap">
-<pre><span class="dec">@app.route</span>(<span class="str">'/api/tracks'</span>)
-<span class="dec">@login_required</span>
-<span class="kw">def</span> <span class="fn">api_tracks</span>():
-    data = <span class="fn">_read_geojson</span>(<span class="str">'tracks.geojson'</span>)
-    <span class="kw">return</span> <span class="fn">jsonify</span>(data)
-
-<span class="kw">def</span> <span class="fn">_read_geojson</span>(filename):
-    path = os.path.<span class="fn">join</span>(GEOJSON_DIR, filename)
-    <span class="kw">with</span> <span class="fn">open</span>(path) <span class="kw">as</span> f:
-        <span class="kw">return</span> json.<span class="fn">load</span>(f)</pre>
-      </div>
-      <div class="callout">
-        <strong>Plain English:</strong> When JavaScript visits <code>/api/tracks</code>, Flask opens the pre-built <code>tracks.geojson</code> file, reads it, and sends it back as a JSON response. The JavaScript then uses that response to draw the bird tracks on the map. This separation (Python serves data, JavaScript draws it) is called a "REST API" pattern.
+    <!-- CODE 4 -->
+    <div class="code-block" style="margin-top:2.5rem">
+      <div class="code-block-head"><span class="code-block-title">4 — How the API Endpoint Works</span><span class="code-block-file">backend/app.py · line 240</span></div>
+      <div class="code-annotated">
+        <div class="code-pane">
+<pre><span class="ln">1</span><span class="kw">def</span> <span class="fn">_read_geojson</span>(filename):
+<span class="ln">2</span>    path <span class="op">=</span> os.path.<span class="fn">join</span>(GEOJSON_DIR, filename)
+<span class="ln">3</span>    <span class="kw">with</span> <span class="fn">open</span>(path) <span class="kw">as</span> f:
+<span class="ln">4</span>        <span class="kw">return</span> json.<span class="fn">load</span>(f)
+<span class="ln">5</span>
+<span class="ln">6</span><span class="dec">@app.route</span>(<span class="str">'/api/tracks'</span>)
+<span class="ln">7</span><span class="dec">@login_required</span>
+<span class="ln">8</span><span class="kw">def</span> <span class="fn">api_tracks</span>():
+<span class="ln">9</span>    <span class="kw">return</span> <span class="fn">jsonify</span>(
+<span class="ln">10</span>        <span class="fn">_read_geojson</span>(<span class="str">'tracks.geojson'</span>)
+<span class="ln">11</span>    )
+<span class="ln">12</span>
+<span class="ln">13</span><span class="dec">@app.route</span>(<span class="str">'/api/bird/&lt;bird_name&gt;'</span>)
+<span class="ln">14</span><span class="dec">@login_required</span>
+<span class="ln">15</span><span class="kw">def</span> <span class="fn">api_bird</span>(bird_name):
+<span class="ln">16</span>    stats <span class="op">=</span> <span class="fn">_read_geojson</span>(<span class="str">'stats.json'</span>)
+<span class="ln">17</span>    bird  <span class="op">=</span> stats[<span class="str">'birds'</span>].<span class="fn">get</span>(bird_name)
+<span class="ln">18</span>    <span class="kw">if not</span> bird:
+<span class="ln">19</span>        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="str">'error'</span>:<span class="str">'not found'</span>}), <span class="num">404</span>
+<span class="ln">20</span>    <span class="kw">return</span> <span class="fn">jsonify</span>(bird)</pre>
+        </div>
+        <div class="anno-pane">
+          <div class="anno"><div class="anno-num">1–4</div><div class="anno-text"><strong>_read_geojson()</strong> — A reusable helper. Opens a file from the static/geojson directory and parses its JSON content into a Python dictionary. The underscore prefix is a Python convention meaning "internal use only".</div></div>
+          <div class="anno"><div class="anno-num">6–11</div><div class="anno-text"><strong>/api/tracks</strong> — When JavaScript calls this URL, Flask returns the entire tracks.geojson file as a JSON response. The browser's map library receives this and draws all three bird paths. <code>jsonify()</code> sets the correct Content-Type header automatically.</div></div>
+          <div class="anno"><div class="anno-num">13</div><div class="anno-text"><strong>&lt;bird_name&gt; in the URL</strong> — This is a dynamic route parameter. If JavaScript calls <code>/api/bird/Castro_O284</code>, Flask extracts "Castro_O284" and passes it to the function as the <code>bird_name</code> variable. One route handles all three birds.</div></div>
+          <div class="anno"><div class="anno-num">16–20</div><div class="anno-text"><strong>stats['birds'].get(bird_name)</strong> — Looks up that specific bird's stats from the JSON dictionary. If the bird name doesn't exist (typo, wrong name), it returns a 404 error response instead of crashing — proper API error handling.</div></div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- FEATURES -->
-  <section class="section" id="features">
-    <p class="section-label">Application Features</p>
-    <h2>What you can do in the app</h2>
-    <p class="lead">The application has five main areas, each with a specific purpose.</p>
+  </div>
+</section>
 
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+<!-- FEATURES -->
+<section class="sec alt" id="features">
+  <div class="sec-inner">
+    <p class="sec-label">What the App Can Do</p>
+    <h2>Every feature, explained</h2>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-name"><div class="feat-dot"></div>Migration Map</div><div class="feat-desc">Interactive map showing all three birds' GPS tracks as coloured lines, stopovers as circle markers, and individual GPS fixes as smaller dots. Click any element for details. Pan and zoom freely.</div></div>
+      <div class="feat"><div class="feat-name"><div class="feat-dot"></div>Dashboard</div><div class="feat-desc">Per-bird stat cards showing total distance, average speed, max speed, max altitude, stopover count, dominant heading, and tracking date range — all calculated from the GPS data.</div></div>
+      <div class="feat"><div class="feat-name"><div class="feat-dot"></div>Timeline Charts</div><div class="feat-desc">Line charts for ground speed and altitude over time for each bird. Shows when the bird was flying fast vs resting, and how altitude changed during the tracking period.</div></div>
+      <div class="feat"><div class="feat-name"><div class="feat-dot"></div>Secure Login</div><div class="feat-desc">Registration and login with bcrypt-hashed passwords. Session management via Flask-Login. Unauthenticated users are redirected to the login page automatically — no page is accessible without a valid session.</div></div>
+      <div class="feat"><div class="feat-name"><div class="feat-dot"></div>Admin Panel</div><div class="feat-desc">Admin-only page showing all registered users, their roles, and registration dates. Admins can change a user's role (admin ↔ researcher) or delete accounts. Protected by a custom @admin_required decorator.</div></div>
+      <div class="feat"><div class="feat-name"><div class="feat-dot"></div>Data Upload</div><div class="feat-desc">Upload a new Excel GPS file (up to 50 MB). The server runs preprocess.py on the new file, overwrites the GeoJSON output files, and the map updates with the new data on next load.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section class="sec" id="setup">
+  <div class="sec-inner">
+    <p class="sec-label">Getting Started</p>
+    <h2>How to run the app on Windows (step by step)</h2>
+    <p class="lead">Five commands, run once. After that just the last command each time to start the app.</p>
+
+    <div class="setup-steps">
+      <div class="sstep">
+        <div class="sstep-n">1</div>
+        <div class="sstep-body">
+          <h4>Clone the code from GitHub</h4>
+          <div class="cmd"><pre>git clone https://github.com/Nirmit2002/birdtrecking.git
+cd birdtrecking</pre></div>
         </div>
-        <h4>Migration Map</h4>
-        <p>Interactive map showing all three birds' GPS tracks, stopover locations, and individual points. Click any marker for details.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <div class="sstep">
+        <div class="sstep-n">2</div>
+        <div class="sstep-body">
+          <h4>Install all Python packages</h4>
+          <div class="cmd"><pre>pip install -r requirements.txt
+pip install pymysql cryptography</pre></div>
         </div>
-        <h4>Dashboard</h4>
-        <p>Overview of all birds with stats cards: total distance, average speed, max altitude, stopover count, and tracking dates.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <div class="sstep">
+        <div class="sstep-n">3</div>
+        <div class="sstep-body">
+          <h4>Add MySQL to PATH (PowerShell — do this each session)</h4>
+          <div class="cmd"><pre>$env:PATH += ";C:\Program Files\MySQL\MySQL Server 8.0\bin"</pre></div>
         </div>
-        <h4>User Management</h4>
-        <p>Admin panel to view all registered users, change their roles (admin or researcher), and remove accounts.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+      <div class="sstep">
+        <div class="sstep-n">4</div>
+        <div class="sstep-body">
+          <h4>Create the database and import data (one time only)</h4>
+          <div class="cmd"><pre>mysql -u root -p -e "CREATE DATABASE stork_db; CREATE USER 'stork_user'@'localhost' IDENTIFIED BY 'stork_pass2024'; GRANT ALL PRIVILEGES ON stork_db.* TO 'stork_user'@'localhost'; FLUSH PRIVILEGES;"
+Get-Content stork_db.sql | mysql -u root -p stork_db</pre></div>
         </div>
-        <h4>Data Upload</h4>
-        <p>Upload new Excel GPS data files. The system preprocesses them automatically and updates the map and statistics.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      <div class="sstep">
+        <div class="sstep-n">5</div>
+        <div class="sstep-body">
+          <h4>Start the app (run this every time)</h4>
+          <div class="cmd"><pre>python backend/app.py</pre></div>
+          <p class="body-p" style="margin-top:.6rem">Open <strong>http://localhost:5000</strong> in any browser.</p>
         </div>
-        <h4>Timeline &amp; Charts</h4>
-        <p>Time-series charts of speed and altitude for each bird over the tracking period, showing patterns in flight behaviour.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-        </div>
-        <h4>Authentication</h4>
-        <p>Secure login and registration with bcrypt-hashed passwords. Two roles: admin (full access) and researcher (view only).</p>
       </div>
     </div>
-  </section>
 
-  <!-- HOW TO RUN -->
-  <section class="section" id="howtorun">
-    <p class="section-label">Setup Reference</p>
-    <h2>How to run the application</h2>
-    <p class="lead">Four commands in sequence. The first three are one-time setup; after that just run the last command each time.</p>
-
-    <div class="code-wrap">
-<pre><span class="cm"># 1. Clone the code from GitHub</span>
-git clone https://github.com/Nirmit2002/birdtrecking.git
-cd birdtrecking
-
-<span class="cm"># 2. Install all Python dependencies</span>
-pip install -r requirements.txt
-pip install pymysql cryptography
-
-<span class="cm"># 3. Set up the database (Windows PowerShell)</span>
-$env:PATH += <span class="str">";C:\Program Files\MySQL\MySQL Server 8.0\bin"</span>
-mysql -u root -p -e <span class="str">"CREATE DATABASE stork_db; CREATE USER 'stork_user'@'localhost' IDENTIFIED BY 'stork_pass2024'; GRANT ALL PRIVILEGES ON stork_db.* TO 'stork_user'@'localhost'; FLUSH PRIVILEGES;"</span>
-Get-Content stork_db.sql | mysql -u root -p stork_db
-
-<span class="cm"># 4. Start the app (run this every time)</span>
-python backend/app.py</pre>
-    </div>
-
-    <p>Then open <strong>http://localhost:5000</strong> in any browser.</p>
-
-    <p style="margin-top:1.5rem"><strong>Login credentials:</strong></p>
+    <p class="sec-label" style="margin-top:2.5rem">Login Credentials</p>
     <table class="creds-table">
-      <thead>
-        <tr>
-          <th>Role</th>
-          <th>Username</th>
-          <th>Password</th>
-          <th>Access</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Role</th><th>Username</th><th>Password</th><th>Access Level</th></tr></thead>
       <tbody>
-        <tr>
-          <td><span class="role-badge role-admin">Admin</span></td>
-          <td>admin</td>
-          <td>admin123</td>
-          <td>Full — all pages, user management, upload</td>
-        </tr>
-        <tr>
-          <td><span class="role-badge role-res">Researcher</span></td>
-          <td>fenil</td>
-          <td>fenil123</td>
-          <td>Map, dashboard, charts — no admin panel</td>
-        </tr>
+        <tr><td><span class="rbadge radmin">Admin</span></td><td>admin</td><td>admin123</td><td>Full — all pages, user management, data upload, reprocess</td></tr>
+        <tr><td><span class="rbadge rres">Researcher</span></td><td>fenil</td><td>fenil123</td><td>Map, dashboard, charts — no admin panel or upload</td></tr>
       </tbody>
     </table>
-
-    <div class="callout" style="margin-top:2rem">
-      <strong>Next time you open VS Code:</strong> MySQL PATH resets each session on Windows. Always run <code>$env:PATH += ";C:\Program Files\MySQL\MySQL Server 8.0\bin"</code> first if you need to access MySQL from the terminal. The app itself (Step 4) doesn't need this — it connects to MySQL directly via Python.
-    </div>
-  </section>
-
-</main>
+  </div>
+</section>
 
 <footer>
-  <div class="inner">
-    <div><strong>White Stork Migration Visualiser</strong> — Full Application Guide</div>
-    <div>Study: White Stork Portugal Adults 2022 &nbsp;·&nbsp; Ciconia ciconia &nbsp;·&nbsp; 3 birds tracked</div>
+  <div class="fi">
+    <div><strong>White Stork Migration Visualiser</strong> — Complete Application Guide</div>
+    <div>Ciconia ciconia · White Stork Portugal Adults 2022 · 3 birds · 90 GPS fixes · May 2022</div>
   </div>
 </footer>
