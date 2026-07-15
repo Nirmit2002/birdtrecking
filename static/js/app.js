@@ -84,7 +84,7 @@ async function loadAllData() {
     const timestamps = tl.map(p => p.timestamp);
     minTs    = Math.min(...timestamps);
     maxTs    = Math.max(...timestamps);
-    currentTs = maxTs;   // start at end so full track is visible
+    currentTs = minTs;   // start at beginning — trail draws progressively
 
     setupTimeline();
     initCharts(timelineData, visibleBirds);
@@ -113,9 +113,9 @@ function addMapLayers() {
       source: `track-src-${bird}`,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint:  {
-        'line-color':   ['match', ['get', 'segment_type'], 'stopped', '#FFC107', color],
-        'line-width':   2,
-        'line-opacity': 0.15,   // ghost background — trail draws on top brightly
+        'line-color':   '#cccccc',  // neutral grey ghost — no yellow, no bird color
+        'line-width':   1,
+        'line-opacity': 0.25,       // very faint guide line only
       },
     });
   });
@@ -132,9 +132,9 @@ function addMapLayers() {
       source: `trail-src-${bird}`,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint:  {
-        'line-color':   ['match', ['get', 'segment_type'], 'stopped', '#FFC107', color],
-        'line-width':   5,
-        'line-opacity': 1.0,    // fully opaque — clearly distinct from ghost background
+        'line-color':   color,   // always bird color — resting shown by yellow circles, not lines
+        'line-width':   4,
+        'line-opacity': 1.0,
       },
     });
 
@@ -183,16 +183,16 @@ function addMapLayers() {
     id: 'stopovers-halo', type: 'circle',
     source: 'stopovers-src',
     paint: {
-      'circle-radius': 14, 'circle-color': '#888888',
-      'circle-opacity': 0.15, 'circle-stroke-width': 0,
+      'circle-radius': 20, 'circle-color': '#FFC107',
+      'circle-opacity': 0.25, 'circle-stroke-width': 0, 'circle-blur': 0.5,
     },
   });
   map.addLayer({
     id: 'stopovers-layer', type: 'circle',
     source: 'stopovers-src',
     paint: {
-      'circle-radius': 7, 'circle-color': '#999999',
-      'circle-opacity': 0.9, 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff',
+      'circle-radius': 9, 'circle-color': '#FFC107',
+      'circle-opacity': 1.0, 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff',
     },
   });
   map.on('click', 'stopovers-layer', e => {
@@ -200,11 +200,11 @@ function addMapLayers() {
     new maplibregl.Popup({ closeButton: false, offset: 14 })
       .setLngLat(e.lngLat)
       .setHTML(`
-        <div style="font-size:13px;">
-          <strong style="color:#cccccc;">⏸ Stop-over</strong><br>
-          <span style="color:#8b949e;">Bird: ${p.bird_id}</span><br>
+        <div style="font-size:13px;color:#111111;line-height:1.6;">
+          <strong style="color:#e6a800;">⏸ Rest / Stop-over</strong><br>
+          <span>Bird: <strong>${p.bird_id.replace('_',' ')}</strong></span><br>
           Duration: <strong>${p.duration_h} h</strong><br>
-          ${p.start_time} → ${p.end_time}
+          <span style="color:#666;">${p.start_time} → ${p.end_time}</span>
         </div>`)
       .addTo(map);
   });
@@ -323,11 +323,11 @@ function renderLegend() {
   legend.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#666666;">
       <span style="display:inline-block;width:24px;height:3px;background:linear-gradient(90deg,#00BCD4 33%,#4CAF50 33%,#4CAF50 66%,#E91E63 66%);border-radius:2px;flex-shrink:0;"></span>
-      <span>Flying (bird color)</span>
+      <span>Flying path (bird color)</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#666666;">
-      <span style="display:inline-block;width:24px;height:3px;background:#FFC107;border-radius:2px;flex-shrink:0;"></span>
-      <span>Stopped / Resting</span>
+      <span style="display:inline-block;width:12px;height:12px;background:#FFC107;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #FFC107;flex-shrink:0;"></span>
+      <span>Rest / Stop-over location</span>
     </div>`;
   togglesEl.parentNode.appendChild(legend);
 }
@@ -365,7 +365,7 @@ function setupTimeline() {
   if (!slider) return;
   slider.min   = 0;
   slider.max   = 1000;
-  slider.value = 1000;   // full timeline shown initially
+  slider.value = 0;      // start at beginning
   updateTimeLabel();
 }
 
