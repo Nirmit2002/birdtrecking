@@ -93,22 +93,34 @@ def load_and_clean(filepath=DATA_FILE):
 # ── GeoJSON builders ─────────────────────────────────────────────────────────
 
 def build_tracks_geojson(df):
-    """One LineString feature per bird."""
+    """Individual 2-point LineString segments per bird, tagged flying or stopped."""
+    STOPPED_MS = 1.0 / 3.6  # 1 km/h in m/s (~0.2778)
     features = []
     for bird_id, bdf in df.groupby('bird_id'):
-        bdf = bdf.sort_values('timestamp')
-        coords = bdf[['lon', 'lat']].values.tolist()
-        if len(coords) < 2:
+        bdf = bdf.sort_values('timestamp').reset_index(drop=True)
+        if len(bdf) < 2:
             continue
-        features.append({
-            'type': 'Feature',
-            'geometry': {'type': 'LineString', 'coordinates': coords},
-            'properties': {
-                'bird_id': bird_id,
-                'color':   BIRD_COLORS.get(bird_id, '#FFFFFF'),
-                'points':  len(bdf),
-            },
-        })
+        bird_color = BIRD_COLORS.get(bird_id, '#FFFFFF')
+        for i in range(len(bdf) - 1):
+            p0 = bdf.iloc[i]
+            p1 = bdf.iloc[i + 1]
+            speed = float(p0['speed_ms']) if 'speed_ms' in bdf.columns else 0.0
+            seg_type = 'stopped' if speed <= STOPPED_MS else 'flying'
+            features.append({
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': [
+                        [float(p0['lon']), float(p0['lat'])],
+                        [float(p1['lon']), float(p1['lat'])],
+                    ],
+                },
+                'properties': {
+                    'bird_id':      bird_id,
+                    'color':        bird_color,
+                    'segment_type': seg_type,
+                },
+            })
     return {'type': 'FeatureCollection', 'features': features}
 
 

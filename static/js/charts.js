@@ -4,9 +4,9 @@
  */
 
 const BIRD_COLORS_HEX = {
-  'Perneta_O285': '#111111',
-  'Castro_O284':  '#555555',
-  'Mineiro_O283': '#999999',
+  'Perneta_O285': '#00BCD4',
+  'Castro_O284':  '#4CAF50',
+  'Mineiro_O283': '#E91E63',
 };
 
 let speedChart   = null;

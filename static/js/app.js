@@ -14,9 +14,9 @@
 
 /* ── Bird metadata ─────────────────────────────────────────── */
 const BIRD_META = {
-  'Perneta_O285': { label: 'Perneta O285', color: '#111111', cssClass: 'cyan' },
-  'Castro_O284':  { label: 'Castro O284',  color: '#555555', cssClass: 'green' },
-  'Mineiro_O283': { label: 'Mineiro O283', color: '#999999', cssClass: 'pink' },
+  'Perneta_O285': { label: 'Perneta O285', color: '#00BCD4', cssClass: 'cyan' },
+  'Castro_O284':  { label: 'Castro O284',  color: '#4CAF50', cssClass: 'green' },
+  'Mineiro_O283': { label: 'Mineiro O283', color: '#E91E63', cssClass: 'pink' },
 };
 
 /* ── App state ─────────────────────────────────────────────── */
@@ -59,8 +59,10 @@ function initMap() {
   map.on('load', async () => {
     await loadAllData();
     addMapLayers();
+    applyLayerVisibility();
     updateMapLayers();
     renderBirdStatsPanel();
+    renderLegend();
     fitMapToBirds();
   });
 }
@@ -111,9 +113,9 @@ function addMapLayers() {
       source: `track-src-${bird}`,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint:  {
-        'line-color':   color,
-        'line-width':   2.5,
-        'line-opacity': 0.55,
+        'line-color':   ['match', ['get', 'segment_type'], 'stopped', '#FFC107', color],
+        'line-width':   2,
+        'line-opacity': 0.15,   // ghost background — trail draws on top brightly
       },
     });
   });
@@ -129,7 +131,11 @@ function addMapLayers() {
       id: `trail-${bird}`, type: 'line',
       source: `trail-src-${bird}`,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint:  { 'line-color': color, 'line-width': 3.5, 'line-opacity': 0.85 },
+      paint:  {
+        'line-color':   ['match', ['get', 'segment_type'], 'stopped', '#FFC107', color],
+        'line-width':   5,
+        'line-opacity': 1.0,    // fully opaque — clearly distinct from ghost background
+      },
     });
 
     // Current position circle
@@ -140,20 +146,21 @@ function addMapLayers() {
       id: `pos-halo-${bird}`, type: 'circle',
       source: `pos-src-${bird}`,
       paint: {
-        'circle-radius': 12,
+        'circle-radius': 22,
         'circle-color':  color,
-        'circle-opacity': 0.25,
+        'circle-opacity': 0.30,
         'circle-stroke-width': 0,
+        'circle-blur': 0.6,
       },
     });
     map.addLayer({
       id: `pos-dot-${bird}`, type: 'circle',
       source: `pos-src-${bird}`,
       paint: {
-        'circle-radius': 6,
+        'circle-radius': 10,
         'circle-color':  color,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#fff',
+        'circle-stroke-width': 3,
+        'circle-stroke-color': '#ffffff',
         'circle-opacity': 1,
       },
     });
@@ -203,7 +210,25 @@ function addMapLayers() {
   });
 }
 
-/* ── Dynamic layer updates ────────────────────────────────── */
+/* ── Layer visibility (only call when toggling birds, not every frame) ── */
+function applyLayerVisibility() {
+  if (!map) return;
+  const visibleBirdList = Object.keys(visibleBirds).filter(b => visibleBirds[b]);
+  Object.keys(BIRD_META).forEach(bird => {
+    const show = visibleBirds[bird];
+    ['track', 'trail', 'pos-halo', 'pos-dot'].forEach(prefix => {
+      if (map.getLayer(`${prefix}-${bird}`))
+        map.setLayoutProperty(`${prefix}-${bird}`, 'visibility', show ? 'visible' : 'none');
+    });
+  });
+  ['stopovers-layer', 'stopovers-halo'].forEach(id => {
+    if (!map.getLayer(id)) return;
+    map.setLayoutProperty(id, 'visibility', visibleBirdList.length ? 'visible' : 'none');
+    map.setFilter(id, ['in', ['get', 'bird_id'], ['literal', visibleBirdList]]);
+  });
+}
+
+/* ── Dynamic layer updates (called every animation frame) ─── */
 function updateMapLayers() {
   if (!timelineData || !map) return;
 
@@ -211,28 +236,25 @@ function updateMapLayers() {
 
   Object.keys(BIRD_META).forEach(bird => {
     const show = visibleBirds[bird];
-
-    // Full track visibility
-    ['track', 'trail', 'pos-halo', 'pos-dot'].forEach(prefix => {
-      if (map.getLayer(`${prefix}-${bird}`))
-        map.setLayoutProperty(`${prefix}-${bird}`, 'visibility', show ? 'visible' : 'none');
-    });
-    if (map.getLayer(`stopovers-layer`))
-      map.setLayoutProperty('stopovers-layer', 'visibility', 'visible');
-
     if (!show) return;
 
     // Trail: ordered line from all points up to currentTs for this bird
     const bPoints = visiblePoints.filter(p => p.bird_id === bird);
 
-    // Update trail source
+    // Update trail source — one segment per point pair, colored by flying/stopped
     if (bPoints.length >= 2) {
-      const lineFeature = {
-        type: 'Feature',
-        geometry: { type: 'LineString', coordinates: bPoints.map(p => [p.lon, p.lat]) },
-        properties: {},
-      };
-      map.getSource(`trail-src-${bird}`).setData({ type: 'FeatureCollection', features: [lineFeature] });
+      const segments = [];
+      for (let i = 0; i < bPoints.length - 1; i++) {
+        const p0 = bPoints[i];
+        const p1 = bPoints[i + 1];
+        const segType = parseFloat(p0.speed_kmh || 0) <= 1.0 ? 'stopped' : 'flying';
+        segments.push({
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: [[p0.lon, p0.lat], [p1.lon, p1.lat]] },
+          properties: { segment_type: segType, bird_id: bird },
+        });
+      }
+      map.getSource(`trail-src-${bird}`).setData({ type: 'FeatureCollection', features: segments });
     } else {
       map.getSource(`trail-src-${bird}`).setData({ type: 'FeatureCollection', features: [] });
     }
@@ -257,6 +279,7 @@ function toggleBird(birdId) {
   visibleBirds[birdId] = !visibleBirds[birdId];
   const sw = document.getElementById(`toggle-${birdId}`);
   if (sw) sw.classList.toggle('active', visibleBirds[birdId]);
+  applyLayerVisibility();
   updateMapLayers();
   updateCharts(timelineData, visibleBirds, currentTs);
 }
@@ -288,6 +311,25 @@ function showPointInfo(props) {
 function degreesToCompass(deg) {
   const dirs = ['N','NE','E','SE','S','SW','W','NW'];
   return dirs[Math.round(((deg % 360) / 45)) % 8];
+}
+
+/* ── Track color legend ───────────────────────────────────── */
+function renderLegend() {
+  const togglesEl = document.querySelector('.bird-toggles');
+  if (!togglesEl || document.getElementById('track-legend')) return;
+  const legend = document.createElement('div');
+  legend.id = 'track-legend';
+  legend.style.cssText = 'margin-top:10px;padding:8px 0 2px;border-top:1px solid #eeeeee;display:flex;flex-direction:column;gap:5px;';
+  legend.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#666666;">
+      <span style="display:inline-block;width:24px;height:3px;background:linear-gradient(90deg,#00BCD4 33%,#4CAF50 33%,#4CAF50 66%,#E91E63 66%);border-radius:2px;flex-shrink:0;"></span>
+      <span>Flying (bird color)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#666666;">
+      <span style="display:inline-block;width:24px;height:3px;background:#FFC107;border-radius:2px;flex-shrink:0;"></span>
+      <span>Stopped / Resting</span>
+    </div>`;
+  togglesEl.parentNode.appendChild(legend);
 }
 
 /* ── Bird stats panel (right sidebar) ────────────────────── */
@@ -364,7 +406,7 @@ function animStep(now) {
   if (lastFrameTime === null) { lastFrameTime = now; }
 
   const elapsed     = (now - lastFrameTime) / 1000;   // real seconds elapsed
-  const dataSeconds = elapsed * playSpeed * 600;       // how many data-seconds to advance
+  const dataSeconds = elapsed * playSpeed * 3600;      // 1 real sec = 1 data-hour at 1× speed
   lastFrameTime     = now;
 
   currentTs = Math.min(currentTs + dataSeconds, maxTs);

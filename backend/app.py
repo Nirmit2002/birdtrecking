@@ -7,6 +7,7 @@ Accessible at: http://10.8.237.176:5000
 import os
 import sys
 import json
+import shutil
 from datetime import datetime
 from functools import wraps
 
@@ -203,6 +204,11 @@ def upload():
     save_path = os.path.join(BASE_DIR, 'data', f.filename)
     f.save(save_path)
     size = os.path.getsize(save_path)
+
+    # Preprocessing always reads data/data.xlsx — overwrite it with the new upload
+    data_xlsx = os.path.join(BASE_DIR, 'data', 'data.xlsx')
+    if save_path != data_xlsx:
+        shutil.copy2(save_path, data_xlsx)
 
     # Run preprocessing on the new file
     ok = run_preprocessing(force=True)
