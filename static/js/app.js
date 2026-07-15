@@ -45,8 +45,8 @@ function initMap() {
   map = new maplibregl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-    center: [-7.5, 38.2],
-    zoom: 6.5,
+    center: [-8.014, 37.693],   // centre of actual data area (Alentejo, Portugal)
+    zoom: 13,
     pitch: 25,
     bearing: 0,
     antialias: true,
@@ -453,8 +453,8 @@ function fitMapToBirds() {
   const lats = timelineData.map(p => p.lat);
   const lons = timelineData.map(p => p.lon);
   map.fitBounds(
-    [[Math.min(...lons) - 0.3, Math.min(...lats) - 0.3],
-     [Math.max(...lons) + 0.3, Math.max(...lats) + 0.3]],
-    { padding: 60, duration: 1200 }
+    [[Math.min(...lons) - 0.04, Math.min(...lats) - 0.04],
+     [Math.max(...lons) + 0.04, Math.max(...lats) + 0.04]],
+    { padding: 60, duration: 1200, maxZoom: 14 }
   );
 }
