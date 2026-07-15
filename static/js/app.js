@@ -406,7 +406,7 @@ function animStep(now) {
   if (lastFrameTime === null) { lastFrameTime = now; }
 
   const elapsed     = (now - lastFrameTime) / 1000;   // real seconds elapsed
-  const dataSeconds = elapsed * playSpeed * 3600;      // 1 real sec = 1 data-hour at 1× speed
+  const dataSeconds = elapsed * playSpeed * 1200;      // 1 real sec = 20 data-minutes at 1× speed
   lastFrameTime     = now;
 
   currentTs = Math.min(currentTs + dataSeconds, maxTs);
